@@ -67,18 +67,18 @@ export default function NameEditorPanel({
     const link = generateGuestLink(guestName);
     const groom = data.groomName || 'Yenricho';
     const bride = data.brideName || 'Veni';
-    const sender = data.senderName ? `\nDari: ${data.senderName}` : '';
+    const targetGuest = guestName?.trim() || 'Bapak/Ibu/Saudara/i';
     
     if (waTemplateType === 'batak') {
-      return `Shalom & Horas,\n\nKepada Yth. *${guestName}*,\n\nDengan memohon berkat dan penyertaan Tuhan Yang Maha Esa, perkenankan kami mengundang Bapak/Ibu/Doli/Inang/Saudara/i untuk menghadiri acara Pemberkatan Nikah dan Pesta Adat pernikahan kami:\n\n💍 *${groom} & ${bride}*${sender}\n\nUntuk melihat rincian acara, lokasi, dan amplop digital, silakan buka tautan undangan resmi berikut:\n👉 ${link}\n\nMerupakan suatu kehormatan dan sukacita yang besar bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir memberikan doa restu.\n\nMauliate godang, Tuhan memberkati.`;
+      return `Shalom & Horas,\n\nKepada Yth.\nBapak/Ibu/Doli/Inang/Saudara/i\n*${targetGuest}*\n_______\n\nDengan memohon berkat dan penyertaan Tuhan Yang Maha Esa, perkenankan kami mengundang Bapak/Ibu/Doli/Inang/Saudara/i, teman sekaligus sahabat, untuk menghadiri acara Pemberkatan Nikah dan Pesta Adat pernikahan kami:\n\n*${groom} dan ${bride}*\n\nBerikut link undangan kami, untuk info lengkap dari acara, bisa kunjungi :\n\n${link}\n\nMerupakan suatu kehormatan dan sukacita yang besar bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir memberikan doa restu.\n\nNote:\nUntuk mendapatkan hasil yg bagus, harap buka melalui google chrome terupdate.\n\nMauliate godang, Tuhan memberkati.\n\nTerima Kasih\n\nHormat kami,\n${groom} dan ${bride}\n________`;
     }
 
     if (waTemplateType === 'keluarga') {
-      return `Halo *${guestName}*,\n\nKabar bahagia dari kami! Dengan rasa syukur, kami ingin mengundang keluarga/sahabat tercinta ke pernikahan kami:\n\n💍 *${groom} & ${bride}*${sender}\n\nBuka undangan digital khusus untukmu di sini:\n👉 ${link}\n\nKehadiran dan doa restu dari kalian sangat berarti bagi kami berdua.\n\nSampai jumpa di hari bahagia kami! ❤️✨`;
+      return `Halo *${targetGuest}*,\n_______\n\nKabar bahagia dari kami! Dengan rasa syukur, perkenankan kami mengundang Bapak/Ibu/Saudara/i, keluarga, teman sekaligus sahabat, untuk menghadiri acara pernikahan kami:\n\n*${groom} dan ${bride}*\n\nBerikut link undangan kami, untuk info lengkap dari acara, bisa kunjungi :\n\n${link}\n\nKehadiran dan doa restu dari kalian sangat berarti bagi kami berdua.\n\nNote:\nUntuk mendapatkan hasil yg bagus, harap buka melalui google chrome terupdate.\n\nTerima Kasih ❤️\n\nHormat kami,\n${groom} dan ${bride}\n________`;
     }
 
-    // Default Formal
-    return `Yth. *${guestName}*,\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara pernikahan kami:\n\n💍 *${groom} & ${bride}*${sender}\n\nUntuk melihat undangan dan amplop digital lengkap, silakan buka tautan berikut:\n👉 ${link}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila berkenan hadir dan memberikan doa restu.\n\nTerima kasih.`;
+    // Default Formal: Persis format template referensi yang diminta user
+    return `Kepada Yth.\nBapak/Ibu/Saudara/i\n*${targetGuest}*\n_______\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i, teman sekaligus sahabat, untuk menghadiri acara pernikahan kami.\n\nBerikut link undangan kami, untuk info lengkap dari acara, bisa kunjungi :\n\n${link}\n\nMerupakan suatu kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan untuk hadir dan memberikan doa restu.\n\nNote:\nUntuk mendapatkan hasil yg bagus, harap buka melalui google chrome terupdate.\n\nTerima Kasih\n\nHormat kami,\n${groom} dan ${bride}\n________`;
   };
 
   const handleCopyLink = (guestName, indexKey = 'single') => {
