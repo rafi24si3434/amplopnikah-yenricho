@@ -7,11 +7,17 @@ export default function FooterSection({ data, onEnterAdmin }) {
   const brideInit = (data.brideName || 'V').charAt(0).toUpperCase();
 
   return (
-    <footer id="footer" className="section-footer">
-      <div className="footer-content reveal">
+    <footer 
+      id="footer" 
+      className="section-footer section-photo-bg"
+      style={{ backgroundImage: "url('/assets/images/2.jpeg')" }}
+    >
+      <div className="section-photo-overlay"></div>
+
+      <div className="footer-content reveal" style={{ position: 'relative', zIndex: 2 }}>
         
         <div className="footer-monogram-top">
-          <MonogramCrest groomInit={groomInit} brideInit={brideInit} size={70} />
+          <MonogramCrest groomInit={groomInit} brideInit={brideInit} size={76} />
         </div>
 
         <BotanicalDivider />

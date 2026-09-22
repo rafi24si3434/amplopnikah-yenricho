@@ -31,8 +31,12 @@ export default function HeroSection({ data }) {
   };
 
   return (
-    <section id="home" className="section section-dark hero-luxury-section">
-      <div className="hero-bg-image"></div>
+    <section 
+      id="home" 
+      className="section section-dark hero-luxury-section section-photo-bg"
+      style={{ backgroundImage: "url('/assets/images/12.jpeg')" }}
+    >
+      <div className="section-photo-overlay"></div>
       <div className="hero-particles" ref={particlesRef}></div>
       <div className="section-content hero-content reveal">
         

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Church, PartyPopper, CalendarDays, Clock, MapPin, Navigation, Map, CalendarPlus, ExternalLink } from 'lucide-react';
+import { Church, PartyPopper, CalendarDays, Clock, MapPin, Navigation, Map, CalendarPlus } from 'lucide-react';
+import { BotanicalDivider } from './Ornaments';
 
 export default function EventSection({ data }) {
   const [timeLeft, setTimeLeft] = useState({
@@ -38,14 +39,25 @@ export default function EventSection({ data }) {
     return () => clearInterval(timer);
   }, [data.weddingDate]);
 
+  const makeGoogleCalendarUrl = (title, details, location, startDateIso, endDateIso) => {
+    const dates = `${startDateIso}/${endDateIso}`;
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}&dates=${dates}`;
+  };
+
   return (
-    <section id="event" className="section section-dark">
+    <section 
+      id="event" 
+      className="section section-dark section-photo-bg"
+      style={{ backgroundImage: "url('/assets/images/9.jpeg')" }}
+    >
+      <div className="section-photo-overlay"></div>
+
       <div className="section-content">
         
         <div className="section-header reveal">
-          <p className="section-label">Waktu & Tempat</p>
-          <h2 className="section-title">Acara Pernikahan</h2>
-          <div className="ornament-line"></div>
+          <p className="section-label">WEDDING EVENT</p>
+          <h2 className="section-title">Waktu & Tempat Acara</h2>
+          <BotanicalDivider />
         </div>
 
         <div className="events-container">
@@ -108,6 +120,23 @@ export default function EventSection({ data }) {
                 <span>Petunjuk Arah (GPS)</span>
               </a>
             </div>
+
+            {/* Google Calendar Button */}
+            <a 
+              href={makeGoogleCalendarUrl(
+                `Pemberkatan Nikah: ${data.groomName || 'Yenricho'} & ${data.brideName || 'Veni'}`,
+                `Pemberkatan Pernikahan Kudus ${data.groomFullName} & ${data.brideFullName} di Gereja HKBP Dame Duri.`,
+                data.pemberkatan.address,
+                '20261003T020000Z',
+                '20261003T043000Z'
+              )}
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="btn-add-calendar"
+            >
+              <CalendarPlus size={15} />
+              <span>Simpan ke Google Calendar</span>
+            </a>
           </div>
 
           {/* Resepsi */}
@@ -168,13 +197,30 @@ export default function EventSection({ data }) {
                 <span>Petunjuk Arah (GPS)</span>
               </a>
             </div>
+
+            {/* Google Calendar Button */}
+            <a 
+              href={makeGoogleCalendarUrl(
+                `Resepsi Adat: ${data.groomName || 'Yenricho'} & ${data.brideName || 'Veni'}`,
+                `Resepsi Pernikahan dan Pesta Adat Batak ${data.groomFullName} & ${data.brideFullName} di Sopo Margurosi Duri.`,
+                data.resepsi.address,
+                '20261003T043000Z',
+                '20261003T110000Z'
+              )}
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="btn-add-calendar"
+            >
+              <CalendarPlus size={15} />
+              <span>Simpan ke Google Calendar</span>
+            </a>
           </div>
 
         </div>
 
         {/* Countdown Timer */}
         <div className="countdown-container reveal">
-          <h3 className="countdown-title">Menghitung Hari</h3>
+          <h3 className="countdown-title">Menghitung Hari Bahagia</h3>
           <div className="countdown-timer" id="countdown">
             <div className="countdown-item">
               <div className="countdown-number">{timeLeft.days}</div>
@@ -196,16 +242,6 @@ export default function EventSection({ data }) {
               <div className="countdown-label">Detik</div>
             </div>
           </div>
-
-          <a 
-            href="https://www.google.com/calendar/render?action=TEMPLATE&text=Pernikahan+Yenricho+%26+Veni&dates=20261003T030000Z/20261003T100000Z&details=Pemberkatan+Nikah+di+Gereja+HKBP+Dame+Duri+dan+Resepsi+di+Sopo+Margurosi&location=Gereja+HKBP+Dame+Duri"
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="btn-calendar"
-          >
-            <CalendarPlus size={18} />
-            <span>Simpan ke Kalender</span>
-          </a>
         </div>
 
       </div>

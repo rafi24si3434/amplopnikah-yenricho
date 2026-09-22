@@ -57,7 +57,7 @@ export default function AdminPage({
       const origin = window.location.origin;
       return `${origin}/`;
     }
-    return 'https://amplopnikah-yenricho-veni.vercel.app/';
+    return 'https://amplopnikah-yenricho.vercel.app/';
   };
 
   const generateGuestLink = (guestName) => {

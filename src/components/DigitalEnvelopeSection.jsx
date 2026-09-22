@@ -79,12 +79,18 @@ export default function DigitalEnvelopeSection({ bankAccounts, giftAddress }) {
   };
 
   return (
-    <section id="envelope-section" className="section section-dark">
+    <section 
+      id="envelope-section" 
+      className="section section-dark section-photo-bg"
+      style={{ backgroundImage: "url('/assets/images/5.jpeg')" }}
+    >
+      <div className="section-photo-overlay"></div>
+
       <div className="section-content">
         
         <div className="section-header reveal">
-          <p className="section-label">Tanda Kasih & Doa Restu</p>
-          <h2 className="section-title">Amplop Digital</h2>
+          <p className="section-label">WEDDING GIFT</p>
+          <h2 className="section-title">Tanda Kasih & Amplop Digital</h2>
           <div className="ornament-line"></div>
           <p className="envelope-intro-text">
             Doa restu Anda merupakan karunia terindah bagi kami. Namun jika Anda bermaksud memberikan tanda kasih, Anda dapat mengirimkannya melalui:

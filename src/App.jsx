@@ -10,11 +10,13 @@ import DigitalEnvelopeSection from './components/DigitalEnvelopeSection';
 import RsvpSection from './components/RsvpSection';
 import WishesSection from './components/WishesSection';
 import FooterSection from './components/FooterSection';
+import PhotoQuoteBanner from './components/PhotoQuoteBanner';
 import MusicPlayer from './components/MusicPlayer';
 import FloatingNav from './components/FloatingNav';
 import EnvelopePrintModal from './components/EnvelopePrintModal';
 import AdminPage from './components/AdminPage';
 import { exportElementToPdf, exportBulkToPdf } from './utils/pdfExport';
+import { triggerLuxuryWeddingConfetti } from './utils/confetti';
 
 export default function App() {
   // Load data from localStorage or defaultData, prioritizing URL params if present
@@ -159,6 +161,9 @@ export default function App() {
 
   // Handle invitation open
   const handleOpenInvitation = () => {
+    // Ledakan confetti mewah kelopak mawar & emas
+    triggerLuxuryWeddingConfetti();
+
     const coverEl = document.getElementById('cover');
     if (coverEl) {
       coverEl.classList.add('fade-out');
@@ -297,9 +302,34 @@ export default function App() {
 
         <HeroSection data={data} />
         <CoupleSection data={data} />
+
+        {/* Parallax Photo Quote Banner 1: Batak Blessing */}
+        <PhotoQuoteBanner 
+          bgImage="/assets/images/14.jpeg"
+          quote="Aek godang tu aek laut, Dos ni roha do sibahen na saut. Horas jala gabe ma hita saluhutna."
+          subtext="Kiranya limpahan berkat, kerukunan, dan damai sejahtera senantiasa menyertai langkah baru kedua mempelai."
+          reference="Umpasa Batak Toba"
+        />
+
         <StorySection stories={data.stories} />
+
+        {/* Parallax Photo Quote Banner 2: Holy Bible Verse */}
+        <PhotoQuoteBanner 
+          bgImage="/assets/images/11.jpeg"
+          quote="Dan di atas semuanya itu: kenakanlah kasih, sebagai pengikat yang mempersatukan dan menyempurnakan."
+          reference="Kolose 3:14"
+        />
+
         <EventSection data={data} />
         <GallerySection />
+
+        {/* Parallax Photo Quote Banner 3: Romantic Promise */}
+        <PhotoQuoteBanner 
+          bgImage="/assets/images/7.jpeg"
+          quote="Dua hati yang dipersatukan dalam cinta dan komitmen suci, melangkah bersama di bawah naungan berkat Tuhan selamanya."
+          reference="Yenricho & Veni"
+        />
+
         <DigitalEnvelopeSection 
           bankAccounts={data.bankAccounts} 
           giftAddress={data.giftAddress} 

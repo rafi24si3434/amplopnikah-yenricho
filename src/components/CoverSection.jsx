@@ -69,6 +69,7 @@ export default function CoverSection({ data, onOpenInvitation, isOpen }) {
             <h2 className="guest-name" id="guest-name">
               {data.recipientName || 'Bapak/Ibu/Saudara/i'}
             </h2>
+            <p className="guest-place">Di Tempat</p>
           </div>
 
           {data.senderName && (

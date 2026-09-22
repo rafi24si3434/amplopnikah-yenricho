@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { User, MessageCircle, Send } from 'lucide-react';
+import { User, MessageCircle, Send, Sparkles } from 'lucide-react';
+import { BotanicalDivider } from './Ornaments';
 
 export default function WishesSection({ defaultName }) {
   const [name, setName] = useState(defaultName || '');
   const [message, setMessage] = useState('');
   const [wishes, setWishes] = useState([]);
+
+  const quickWishes = [
+    "Selamat berbahagia Yenricho & Veni! Langgeng sampai kakek nenek. 💍❤️",
+    "Tuhan memberkati rumah tangga baru kalian dengan limpahan kasih dan damai sejahtera. 🙏✨",
+    "Horas & Mauliate! Selamat menempuh hidup baru berdua. Pesta adat yang penuh sukacita!",
+    "Doa terbaik untuk hari bahagia kalian berdua, rukun dan sejahtera selalu. 💒🕊️"
+  ];
 
   useEffect(() => {
     try {
@@ -67,13 +75,19 @@ export default function WishesSection({ defaultName }) {
   };
 
   return (
-    <section id="wishes" className="section section-dark">
+    <section 
+      id="wishes" 
+      className="section section-dark section-photo-bg"
+      style={{ backgroundImage: "url('/assets/images/24.jpeg')" }}
+    >
+      <div className="section-photo-overlay"></div>
+
       <div className="section-content">
         
         <div className="section-header reveal">
-          <p className="section-label">Ucapan & Doa</p>
-          <h2 className="section-title">Kirim Ucapan</h2>
-          <div className="ornament-line"></div>
+          <p className="section-label">DOA & RESTU</p>
+          <h2 className="section-title">Ucapan & Doa Restu Tamu</h2>
+          <BotanicalDivider />
         </div>
 
         <div className="wishes-container">
@@ -89,57 +103,75 @@ export default function WishesSection({ defaultName }) {
                     <User size={18} />
                     <input 
                       type="text" 
-                      id="wish-name"
+                      id="wish-name" 
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="Nama Anda" 
+                      placeholder="Nama Anda / Keluarga" 
                       required 
                     />
                   </div>
                 </div>
 
+                {/* Quick Wishes Bubbles */}
+                <div className="quick-wishes-section">
+                  <span className="quick-wishes-label">✨ Pilihan Balon Ucapan Cepat:</span>
+                  <div className="quick-wishes-row">
+                    {quickWishes.map((preset, idx) => (
+                      <button 
+                        key={idx} 
+                        type="button" 
+                        className="wish-bubble-btn"
+                        onClick={() => setMessage(preset)}
+                      >
+                        {preset.slice(0, 36)}...
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="form-group">
-                  <label htmlFor="wish-message">Ucapan & Doa</label>
+                  <label htmlFor="wish-message">Pesan & Doa Restu</label>
                   <div className="input-wrapper textarea-wrapper">
-                    <MessageCircle size={18} />
+                    <MessageCircle size={18} className="textarea-icon" />
                     <textarea 
                       id="wish-message" 
-                      rows="4"
+                      rows="4" 
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      placeholder="Tulis ucapan dan doa terbaik untuk kedua mempelai..."
+                      placeholder="Tuliskan harapan dan doa terbaik untuk Yenricho & Veni..." 
                       required
                     ></textarea>
                   </div>
                 </div>
 
-                <button type="submit" className="btn-submit">
+                <button type="submit" className="btn-submit" id="btn-submit-wish">
                   <Send size={18} />
                   <span>Kirim Ucapan</span>
                 </button>
-
               </form>
             </div>
           </div>
 
-          {/* List */}
+          {/* List of Wishes */}
           <div className="wishes-list-wrapper reveal">
+            <div className="wishes-list-header">
+              <h3>{wishes.length} Doa & Ucapan Hangat</h3>
+            </div>
             <div className="wishes-list" id="wishes-list">
-              {wishes.map((wish, index) => {
-                const initial = wish.name.charAt(0).toUpperCase();
-                return (
-                  <div key={index} className="wish-card">
-                    <div className="wish-card-header">
-                      <div className="wish-avatar">{initial}</div>
-                      <div>
-                        <div className="wish-author">{wish.name}</div>
-                        <div className="wish-time">{getTimeAgo(wish.time)}</div>
-                      </div>
-                    </div>
-                    <div className="wish-text">{wish.message}</div>
+              {wishes.map((wish, index) => (
+                <div key={index} className="wish-item glass-card">
+                  <div className="wish-avatar">
+                    {(wish.name || 'G').charAt(0).toUpperCase()}
                   </div>
-                );
-              })}
+                  <div className="wish-content">
+                    <div className="wish-author-row">
+                      <h4 className="wish-author">{wish.name}</h4>
+                      <span className="wish-time">{getTimeAgo(wish.time)}</span>
+                    </div>
+                    <p className="wish-text">{wish.message}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 

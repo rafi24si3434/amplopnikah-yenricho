@@ -39,7 +39,16 @@ export default function MusicPlayer({ shouldAutoPlay }) {
         onClick={toggleMusic}
         title={isPlaying ? 'Pause Musik' : 'Putar Musik'}
       >
-        {isPlaying ? <Music size={22} /> : <VolumeX size={22} />}
+        <div className="music-toggle-inner">
+          {isPlaying ? <Music size={20} className="music-icon-playing" /> : <VolumeX size={20} />}
+          {isPlaying && (
+            <div className="equalizer-bars-mini" title="Musik Berputar">
+              <span className="eq-bar bar-1"></span>
+              <span className="eq-bar bar-2"></span>
+              <span className="eq-bar bar-3"></span>
+            </div>
+          )}
+        </div>
       </button>
     </>
   );
