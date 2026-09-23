@@ -12,6 +12,7 @@ import WishesSection from './components/WishesSection';
 import FooterSection from './components/FooterSection';
 import PhotoQuoteBanner from './components/PhotoQuoteBanner';
 import FloatingNav from './components/FloatingNav';
+import MusicPlayer from './components/MusicPlayer';
 import EnvelopePrintModal from './components/EnvelopePrintModal';
 import AdminPage from './components/AdminPage';
 import { exportElementToPdf, exportBulkToPdf } from './utils/pdfExport';
@@ -86,6 +87,7 @@ export default function App() {
 
   const [activeBulkIndex, setActiveBulkIndex] = useState(0);
   const [isInvitationOpen, setIsInvitationOpen] = useState(false);
+  const [startMusic, setStartMusic] = useState(false);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -186,6 +188,9 @@ export default function App() {
   const handleOpenInvitation = () => {
     // Ledakan confetti mewah kelopak mawar & emas
     triggerLuxuryWeddingConfetti();
+
+    // Mulai putar lagu romantis Batak secara otomatis
+    setStartMusic(true);
 
     const coverEl = document.getElementById('cover');
     if (coverEl) {
@@ -319,12 +324,22 @@ export default function App() {
 
       {/* 2. MAIN INVITATION CONTENT (revealed when opened) */}
       <main id="main-content" className={isInvitationOpen ? '' : 'hidden'}>
+        <MusicPlayer shouldAutoPlay={startMusic} />
         <FloatingNav />
 
         <HeroSection data={data} />
         <CoupleSection data={data} />
 
-        {/* Parallax Photo Quote Banner 1: Batak Blessing */}
+        {/* Parallax Photo Quote Banner 1: Holy Bible Verse */}
+        <PhotoQuoteBanner 
+          bgImage="/assets/images/11.jpeg"
+          quote="Dan di atas semuanya itu: kenakanlah kasih, sebagai pengikat yang mempersatukan dan menyempurnakan."
+          reference="Kolose 3:14"
+        />
+
+        <EventSection data={data} />
+
+        {/* Parallax Photo Quote Banner 2: Batak Blessing */}
         <PhotoQuoteBanner 
           bgImage="/assets/images/14.jpeg"
           quote="Aek godang tu aek laut, Dos ni roha do sibahen na saut. Horas jala gabe ma hita saluhutna."
@@ -333,15 +348,6 @@ export default function App() {
         />
 
         <StorySection stories={data.stories} />
-
-        {/* Parallax Photo Quote Banner 2: Holy Bible Verse */}
-        <PhotoQuoteBanner 
-          bgImage="/assets/images/11.jpeg"
-          quote="Dan di atas semuanya itu: kenakanlah kasih, sebagai pengikat yang mempersatukan dan menyempurnakan."
-          reference="Kolose 3:14"
-        />
-
-        <EventSection data={data} />
         <GallerySection />
 
         {/* Parallax Photo Quote Banner 3: Romantic Promise */}

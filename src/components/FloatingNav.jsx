@@ -6,8 +6,8 @@ export default function FloatingNav() {
   const navItems = [
     { id: 'home', label: 'Home' },
     { id: 'couple', label: 'Mempelai' },
-    { id: 'story', label: 'Kisah Cinta' },
     { id: 'event', label: 'Acara & Lokasi' },
+    { id: 'story', label: 'Kisah Cinta' },
     { id: 'gallery', label: 'Galeri' },
     { id: 'envelope-section', label: 'Amplop & Kado' },
     { id: 'rsvp', label: 'RSVP' },

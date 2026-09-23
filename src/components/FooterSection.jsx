@@ -40,6 +40,10 @@ export default function FooterSection({ data, onEnterAdmin }) {
           © 2026 {data.groomName || 'Yenricho'} & {data.brideName || 'Veni'} Wedding. All Rights Reserved.
         </p>
 
+        <p className="footer-creator-credit">
+          Web ini buatan <span className="creator-name">unluckyyyy</span>
+        </p>
+
         {onEnterAdmin && (
           <div className="footer-admin-trigger">
             <button 

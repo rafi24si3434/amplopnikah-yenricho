@@ -6553,3 +6553,24 @@ textarea {
     transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px))) scale(0.2);
   }
 }
+
+/* ========================================================
+   FOOTER CREATOR CREDIT
+   ======================================================== */
+.footer-creator-credit {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  letter-spacing: 0.5px;
+}
+
+.footer-creator-credit .creator-name {
+  font-weight: 800;
+  color: var(--gold-dark);
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
