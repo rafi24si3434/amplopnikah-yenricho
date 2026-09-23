@@ -12,7 +12,7 @@ export default function StorySection({ stories }) {
   // Curated authentic prewedding milestone replacement photos
   const milestonePhotos = [
     {
-      src: '/assets/images/4.jpeg',
+      src: '/assets/images/27.jpeg',
       subtitle: 'Awal Perjumpaan yang Membawa Cerita Baru'
     },
     {
@@ -73,7 +73,7 @@ export default function StorySection({ stories }) {
                   {/* Photo Banner with Protected Non-Inspectable Image */}
                   <div className="story-card-photo-wrapper">
                     <img 
-                      src={photoData.src} 
+                      src={story.photo || story.image || photoData.src} 
                       alt={story.title} 
                       className="story-card-img non-inspectable-img"
                       loading="lazy"

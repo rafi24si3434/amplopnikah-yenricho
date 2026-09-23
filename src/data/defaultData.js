@@ -87,6 +87,7 @@ export const defaultData = {
     {
       year: 'Awal 2023',
       title: 'Awal Mula Perkenalan',
+      photo: '/assets/images/27.jpeg',
       desc: 'Kisah kami dimulai Awal tahun 2023, dari sebuah perkenalan singkat melalui seorang teman. Awalnya, kami hanya bertegur sapa dan bertukar pesan secara santai, mencoba saling mengenal satu sama lain di tengah kesibukan masing-masing.',
       description: 'Kisah kami dimulai Awal tahun 2023, dari sebuah perkenalan singkat melalui seorang teman. Awalnya, kami hanya bertegur sapa dan bertukar pesan secara santai, mencoba saling mengenal satu sama lain di tengah kesibukan masing-masing.'
     },
