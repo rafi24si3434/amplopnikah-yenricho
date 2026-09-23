@@ -11,12 +11,12 @@ import RsvpSection from './components/RsvpSection';
 import WishesSection from './components/WishesSection';
 import FooterSection from './components/FooterSection';
 import PhotoQuoteBanner from './components/PhotoQuoteBanner';
-import MusicPlayer from './components/MusicPlayer';
 import FloatingNav from './components/FloatingNav';
 import EnvelopePrintModal from './components/EnvelopePrintModal';
 import AdminPage from './components/AdminPage';
 import { exportElementToPdf, exportBulkToPdf } from './utils/pdfExport';
 import { triggerLuxuryWeddingConfetti } from './utils/confetti';
+import { initUlosShimmer, initBatakCursorTrail } from './utils/batakInteractions';
 
 export default function App() {
   // Load data from localStorage or defaultData, prioritizing URL params if present
@@ -25,7 +25,20 @@ export default function App() {
     try {
       const saved = localStorage.getItem('amplop_data');
       if (saved) {
-        initial = { ...defaultData, ...JSON.parse(saved) };
+        const parsed = JSON.parse(saved);
+        if (!parsed.groomParents || parsed.groomParents.includes('...')) {
+          parsed.groomParents = defaultData.groomParents;
+        }
+        if (!parsed.groomChildOrder) {
+          parsed.groomChildOrder = defaultData.groomChildOrder;
+        }
+        if (!parsed.brideParents || parsed.brideParents.includes('...')) {
+          parsed.brideParents = defaultData.brideParents;
+        }
+        if (!parsed.brideChildOrder) {
+          parsed.brideChildOrder = defaultData.brideChildOrder;
+        }
+        initial = { ...defaultData, ...parsed };
       }
     } catch (e) {
       console.error(e);
@@ -72,7 +85,6 @@ export default function App() {
   const [isInvitationOpen, setIsInvitationOpen] = useState(false);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const [startMusic, setStartMusic] = useState(false);
 
   // Check if URL is an admin route (/admin, ?admin, #admin)
   const checkIsAdmin = () => {
@@ -156,7 +168,15 @@ export default function App() {
 
     reveals.forEach((el) => observer.observe(el));
 
-    return () => observer.disconnect();
+    // Initialize metallic gold shimmer sweep on Batak Ulos ribbons & interactive Batak cursor trail
+    const cleanupShimmer = initUlosShimmer();
+    const cleanupCursor = initBatakCursorTrail();
+
+    return () => {
+      observer.disconnect();
+      if (cleanupShimmer) cleanupShimmer();
+      if (cleanupCursor) cleanupCursor();
+    };
   }, [isInvitationOpen]);
 
   // Handle invitation open
@@ -172,7 +192,6 @@ export default function App() {
 
     setTimeout(() => {
       setIsInvitationOpen(true);
-      setStartMusic(true);
       // Trigger instant reveal for hero
       setTimeout(() => {
         document.querySelectorAll('.reveal').forEach((el) => {
@@ -297,7 +316,6 @@ export default function App() {
 
       {/* 2. MAIN INVITATION CONTENT (revealed when opened) */}
       <main id="main-content" className={isInvitationOpen ? '' : 'hidden'}>
-        <MusicPlayer shouldAutoPlay={startMusic} />
         <FloatingNav />
 
         <HeroSection data={data} />

@@ -428,6 +428,29 @@ export default function NameEditorPanel({
                   </div>
                 </div>
 
+                <div className="editor-grid-2">
+                  <div className="editor-form-group">
+                    <label>Orang Tua Pria ({data.groomChildOrder || 'Putra pertama'})</label>
+                    <input 
+                      type="text"
+                      value={data.groomParents || 'Bapak B. Silaban & Ibu R. Panjaitan'}
+                      onChange={(e) => handleChange('groomParents', e.target.value)}
+                      placeholder="Bapak B. Silaban & Ibu R. Panjaitan"
+                      className="editor-input"
+                    />
+                  </div>
+                  <div className="editor-form-group">
+                    <label>Orang Tua Wanita ({data.brideChildOrder || 'Putri terakhir'})</label>
+                    <input 
+                      type="text"
+                      value={data.brideParents || 'Bapak A. Sitanggang & Ibu R. Manurung'}
+                      onChange={(e) => handleChange('brideParents', e.target.value)}
+                      placeholder="Bapak A. Sitanggang & Ibu R. Manurung"
+                      className="editor-input"
+                    />
+                  </div>
+                </div>
+
                 {/* Action Buttons */}
                 <div className="editor-action-row">
                   <button 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Heart, Calendar, MessageCircleHeart, Sparkles } from 'lucide-react';
-import { BotanicalDivider, CornerFiligree } from './Ornaments';
+import { UlosRibbonDivider, GorgaBatakOrnament, CornerGorgaFiligree } from './Ornaments';
 
 export default function StorySection({ stories }) {
   const storyIcons = [
@@ -38,7 +38,8 @@ export default function StorySection({ stories }) {
         <div className="section-header reveal">
           <p className="section-label">LOVE STORY</p>
           <h2 className="section-title">Kisah Perjalanan Kasih</h2>
-          <BotanicalDivider />
+          <GorgaBatakOrnament size={44} />
+          <UlosRibbonDivider />
           <p className="gallery-subtitle">
             Setiap detik yang kami lalui adalah untaian doa dan anugerah Tuhan
           </p>
@@ -64,38 +65,35 @@ export default function StorySection({ stories }) {
                   </div>
                 </div>
 
-                {/* Content Card with Non-Inspectable Pure Visual Photo */}
+                {/* Milestone Content Card */}
                 <div className="story-card">
-                  <CornerFiligree position="top-left" />
-                  <CornerFiligree position="bottom-right" />
-
-                  {/* Photo Frame Container (Non-clickable, no inspect) */}
-                  <div className="story-card-photo-box unselectable-photo">
+                  {/* Authentic Batak Gorga Corner Accents */}
+                  <CornerGorgaFiligree position={isLeft ? 'top-left' : 'top-right'} />
+                  
+                  {/* Photo Banner with Protected Non-Inspectable Image */}
+                  <div className="story-card-photo-wrapper">
                     <img 
                       src={photoData.src} 
                       alt={story.title} 
                       className="story-card-img non-inspectable-img"
-                      loading="lazy" 
-                      draggable="false"
+                      loading="lazy"
                       onContextMenu={(e) => e.preventDefault()}
+                      onDragStart={(e) => e.preventDefault()}
                     />
                     <div className="story-card-photo-overlay"></div>
-                    <div className="story-chapter-pill">
-                      <span>BAB 0{index + 1}</span>
-                    </div>
+                    <span className="story-chapter-pill">CHAPTER 0{index + 1}</span>
                   </div>
 
-                  {/* Body Text */}
+                  {/* Card Content Body */}
                   <div className="story-card-body">
                     <div className="story-badge">
                       <Calendar size={13} />
                       <span>{story.year}</span>
                     </div>
+
                     <h3 className="story-title">{story.title}</h3>
-                    {photoData.subtitle && (
-                      <p className="story-subtitle">{photoData.subtitle}</p>
-                    )}
-                    <p className="story-desc">{story.desc}</p>
+                    <p className="story-subtitle">{photoData.subtitle}</p>
+                    <p className="story-desc">{story.description}</p>
                   </div>
                 </div>
               </div>
@@ -103,6 +101,7 @@ export default function StorySection({ stories }) {
           })}
         </div>
 
+        <UlosRibbonDivider className="mt-8" />
       </div>
     </section>
   );

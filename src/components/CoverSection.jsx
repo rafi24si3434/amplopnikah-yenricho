@@ -1,28 +1,17 @@
 import React, { useEffect, useRef } from 'react';
 import { MailOpen } from 'lucide-react';
-import { MonogramCrest, WaxSeal, CornerFiligree } from './Ornaments';
+import { MonogramCrest, WaxSeal, CornerGorgaFiligree, UlosRibbonDivider } from './Ornaments';
+import { triggerWaxSealStampRelease, initDaylightFloatingParticles } from '../utils/batakInteractions';
 
 export default function CoverSection({ data, onOpenInvitation, isOpen }) {
   const petalsRef = useRef(null);
+  const sealRef = useRef(null);
 
   useEffect(() => {
     const container = petalsRef.current;
     if (!container) return;
-    container.innerHTML = '';
-    const colors = ['#C9A96E', '#E8D5B7', '#B76E79', '#D4AF37', '#87A878'];
-    for (let i = 0; i < 24; i++) {
-      const petal = document.createElement('div');
-      petal.classList.add('petal');
-      petal.style.left = Math.random() * 100 + '%';
-      petal.style.animationDuration = (6 + Math.random() * 8) + 's';
-      petal.style.animationDelay = (Math.random() * 10) + 's';
-      const size = (8 + Math.random() * 10) + 'px';
-      petal.style.width = size;
-      petal.style.height = size;
-      petal.style.background = colors[Math.floor(Math.random() * colors.length)];
-      petal.style.opacity = '0';
-      container.appendChild(petal);
-    }
+    const cleanup = initDaylightFloatingParticles(container, 30);
+    return cleanup;
   }, []);
 
   if (isOpen) return null;
@@ -30,15 +19,19 @@ export default function CoverSection({ data, onOpenInvitation, isOpen }) {
   const groomInit = (data.groomName || 'Y').charAt(0).toUpperCase();
   const brideInit = (data.brideName || 'V').charAt(0).toUpperCase();
 
+  const handleSealClick = () => {
+    triggerWaxSealStampRelease(sealRef.current, onOpenInvitation);
+  };
+
   return (
     <section id="cover" className="cover-section">
       <div className="cover-overlay"></div>
       <div className="floating-petals" ref={petalsRef}></div>
       <div className="cover-content">
         
-        {/* Royal Monogram Crest at the Top */}
+        {/* Royal Batak Monogram Crest at the Top */}
         <div className="cover-monogram-top">
-          <MonogramCrest groomInit={groomInit} brideInit={brideInit} size={74} />
+          <MonogramCrest groomInit={groomInit} brideInit={brideInit} size={78} />
         </div>
 
         <p className="cover-subtitle">THE WEDDING OF</p>
@@ -52,17 +45,16 @@ export default function CoverSection({ data, onOpenInvitation, isOpen }) {
 
         <p className="cover-date">{data.weddingDateText || 'Sabtu, 03 Oktober 2026'}</p>
 
-        {/* Dynamic Envelope Guest & Sender Box with Corner Filigree */}
-        <div className="cover-envelope-card" id="guest-section">
-          {/* 4 Corner Ornaments */}
-          <CornerFiligree position="top-left" />
-          <CornerFiligree position="top-right" />
-          <CornerFiligree position="bottom-left" />
-          <CornerFiligree position="bottom-right" />
+        {/* Traditional Batak Ulos Weave Divider */}
+        <UlosRibbonDivider />
 
-          <div className="envelope-badge">
-            <span className="envelope-tag">✦ AMPLOP UNDANGAN RESMI ✦</span>
-          </div>
+        {/* Dynamic Envelope Guest & Sender Box with Corner Gorga Filigrees */}
+        <div className="cover-envelope-card" id="guest-section">
+          {/* 4 Authentic Batak Gorga Corner Ornaments */}
+          <CornerGorgaFiligree position="top-left" />
+          <CornerGorgaFiligree position="top-right" />
+          <CornerGorgaFiligree position="bottom-left" />
+          <CornerGorgaFiligree position="bottom-right" />
 
           <div className="cover-guest-row">
             <p className="guest-label">Kepada Yth. Bapak/Ibu/Saudara/i:</p>
@@ -81,23 +73,28 @@ export default function CoverSection({ data, onOpenInvitation, isOpen }) {
           )}
         </div>
 
-        {/* Realistic 3D Royal Wax Seal & Open Button */}
+        {/* Realistic 3D Royal Wax Seal & Open Action with Shockwave Release */}
         <div className="cover-open-action">
-          <div className="wax-seal-container" onClick={onOpenInvitation} title="Klik Segel untuk Buka Undangan">
-            <WaxSeal groomInit={groomInit} brideInit={brideInit} size={64} />
+          <div 
+            ref={sealRef} 
+            className="wax-seal-container" 
+            onClick={handleSealClick} 
+            title="Tekan Segel Lilin untuk Membuka Undangan"
+          >
+            <WaxSeal groomInit={groomInit} brideInit={brideInit} size={68} />
           </div>
 
           <button 
             className="btn-open" 
             id="btn-open-invitation"
-            onClick={onOpenInvitation}
+            onClick={handleSealClick}
           >
             <MailOpen className="btn-icon" size={18} />
             <span>Buka Undangan</span>
           </button>
         </div>
 
-        <p className="cover-hint-text">Sentuh segel atau tombol untuk membuka undangan</p>
+        <p className="cover-hint-text">Sentuh segel lilin atau tombol untuk membuka undangan</p>
 
       </div>
     </section>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, MessageCircle, Send, Sparkles } from 'lucide-react';
-import { BotanicalDivider } from './Ornaments';
+import { UlosRibbonDivider, GorgaBatakOrnament, CornerGorgaFiligree } from './Ornaments';
 
 export default function WishesSection({ defaultName }) {
   const [name, setName] = useState(defaultName || '');
@@ -8,6 +8,7 @@ export default function WishesSection({ defaultName }) {
   const [wishes, setWishes] = useState([]);
 
   const quickWishes = [
+    "Sai gabe ma jala horas, pir tondi madingin, tondi matogu! Selamat berbahagia Yenricho & Veni! 🌾💒",
     "Selamat berbahagia Yenricho & Veni! Langgeng sampai kakek nenek. 💍❤️",
     "Tuhan memberkati rumah tangga baru kalian dengan limpahan kasih dan damai sejahtera. 🙏✨",
     "Horas & Mauliate! Selamat menempuh hidup baru berdua. Pesta adat yang penuh sukacita!",
@@ -87,7 +88,8 @@ export default function WishesSection({ defaultName }) {
         <div className="section-header reveal">
           <p className="section-label">DOA & RESTU</p>
           <h2 className="section-title">Ucapan & Doa Restu Tamu</h2>
-          <BotanicalDivider />
+          <GorgaBatakOrnament size={44} />
+          <UlosRibbonDivider />
         </div>
 
         <div className="wishes-container">
@@ -95,6 +97,8 @@ export default function WishesSection({ defaultName }) {
           {/* Form */}
           <div className="wishes-form-wrapper reveal">
             <div className="wishes-form glass-card">
+              <CornerGorgaFiligree position="top-left" />
+              <CornerGorgaFiligree position="bottom-right" />
               <form onSubmit={handleSubmit} id="wishes-form">
                 
                 <div className="form-group">

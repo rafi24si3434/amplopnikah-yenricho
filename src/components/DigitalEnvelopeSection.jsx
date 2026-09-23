@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Gift, CreditCard, Copy, Check, MapPin, Phone, MessageSquare, HeartHandshake, Wifi, Sparkles } from 'lucide-react';
+import { UlosRibbonDivider, GorgaBatakOrnament, CornerGorgaFiligree } from './Ornaments';
 
 export default function DigitalEnvelopeSection({ bankAccounts, giftAddress }) {
   const [copiedAccount, setCopiedAccount] = useState('');
@@ -91,7 +92,8 @@ export default function DigitalEnvelopeSection({ bankAccounts, giftAddress }) {
         <div className="section-header reveal">
           <p className="section-label">WEDDING GIFT</p>
           <h2 className="section-title">Tanda Kasih & Amplop Digital</h2>
-          <div className="ornament-line"></div>
+          <GorgaBatakOrnament size={44} />
+          <UlosRibbonDivider />
           <p className="envelope-intro-text">
             Doa restu Anda merupakan karunia terindah bagi kami. Namun jika Anda bermaksud memberikan tanda kasih, Anda dapat mengirimkannya melalui:
           </p>

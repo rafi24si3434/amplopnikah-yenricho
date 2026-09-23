@@ -1,5 +1,5 @@
 import React from 'react';
-import { MonogramCrest, BotanicalDivider } from './Ornaments';
+import { MonogramCrest, UlosRibbonDivider, GorgaBatakOrnament } from './Ornaments';
 import { Lock } from 'lucide-react';
 
 export default function FooterSection({ data, onEnterAdmin }) {
@@ -17,10 +17,11 @@ export default function FooterSection({ data, onEnterAdmin }) {
       <div className="footer-content reveal" style={{ position: 'relative', zIndex: 2 }}>
         
         <div className="footer-monogram-top">
-          <MonogramCrest groomInit={groomInit} brideInit={brideInit} size={76} />
+          <MonogramCrest groomInit={groomInit} brideInit={brideInit} size={78} />
         </div>
 
-        <BotanicalDivider />
+        <GorgaBatakOrnament size={40} />
+        <UlosRibbonDivider />
 
         <p className="footer-thanks">
           Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila
@@ -33,7 +34,7 @@ export default function FooterSection({ data, onEnterAdmin }) {
 
         <p className="footer-hashtag">#{data.groomName || 'Yenricho'}{data.brideName || 'Veni'}Wedding</p>
 
-        <BotanicalDivider />
+        <UlosRibbonDivider />
 
         <p className="footer-copyright">
           © 2026 {data.groomName || 'Yenricho'} & {data.brideName || 'Veni'} Wedding. All Rights Reserved.

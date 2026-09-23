@@ -2,11 +2,13 @@ export const defaultData = {
   // Couple Names
   groomName: 'Yenricho',
   groomFullName: 'Yenricho Noprian T Silaban',
-  groomParents: 'Bapak ... & Ibu ...',
+  groomChildOrder: 'Putra pertama dari:',
+  groomParents: 'Bapak B. Silaban & Ibu R. Panjaitan',
   
   brideName: 'Veni',
   brideFullName: 'Veni Gracia Br Sitanggang, S.Pd',
-  brideParents: 'Bapak ... & Ibu ...',
+  brideChildOrder: 'Putri terakhir dari:',
+  brideParents: 'Bapak A. Sitanggang & Ibu R. Manurung',
 
   // Envelope details
   senderName: 'Keluarga Besar Silaban & Sitanggang',

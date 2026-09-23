@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Church, PartyPopper, CalendarDays, Clock, MapPin, Navigation, Map, CalendarPlus } from 'lucide-react';
-import { BotanicalDivider } from './Ornaments';
+import { UlosRibbonDivider, GorgaBatakOrnament, CornerGorgaFiligree } from './Ornaments';
 
 export default function EventSection({ data }) {
   const [timeLeft, setTimeLeft] = useState({
@@ -57,13 +57,16 @@ export default function EventSection({ data }) {
         <div className="section-header reveal">
           <p className="section-label">WEDDING EVENT</p>
           <h2 className="section-title">Waktu & Tempat Acara</h2>
-          <BotanicalDivider />
+          <GorgaBatakOrnament size={46} />
+          <UlosRibbonDivider />
         </div>
 
         <div className="events-container">
           
           {/* Pemberkatan */}
           <div className="event-card glass-card reveal reveal-left">
+            <CornerGorgaFiligree position="top-left" />
+            <CornerGorgaFiligree position="bottom-right" />
             <div className="event-icon">
               <Church size={44} />
             </div>
@@ -141,6 +144,8 @@ export default function EventSection({ data }) {
 
           {/* Resepsi */}
           <div className="event-card glass-card reveal reveal-right">
+            <CornerGorgaFiligree position="top-right" />
+            <CornerGorgaFiligree position="bottom-left" />
             <div className="event-icon">
               <PartyPopper size={44} />
             </div>

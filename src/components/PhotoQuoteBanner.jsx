@@ -1,5 +1,5 @@
 import React from 'react';
-import { BotanicalDivider } from './Ornaments';
+import { UlosRibbonDivider, GorgaBatakOrnament } from './Ornaments';
 
 export default function PhotoQuoteBanner({ bgImage, quote, subtext, reference, ornament = true }) {
   return (
@@ -10,7 +10,7 @@ export default function PhotoQuoteBanner({ bgImage, quote, subtext, reference, o
       <div className="section-photo-overlay banner-overlay"></div>
       
       <div className="banner-content reveal">
-        {ornament && <div className="banner-ornament-top">✦ ✦ ✦</div>}
+        {ornament && <GorgaBatakOrnament size={36} />}
         
         <p className="banner-quote-text">
           "{quote}"
@@ -28,7 +28,7 @@ export default function PhotoQuoteBanner({ bgImage, quote, subtext, reference, o
           </p>
         )}
 
-        {ornament && <BotanicalDivider />}
+        {ornament && <UlosRibbonDivider />}
       </div>
     </div>
   );

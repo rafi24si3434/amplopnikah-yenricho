@@ -1,7 +1,21 @@
-import React from 'react';
-import { WeddingRings, CornerFiligree, BotanicalDivider } from './Ornaments';
+import React, { useEffect, useRef } from 'react';
+import { WeddingRings, CornerGorgaFiligree, UlosRibbonDivider, GorgaBatakOrnament } from './Ornaments';
+import { attach3DParallaxTilt } from '../utils/batakInteractions';
 
 export default function CoupleSection({ data }) {
+  const groomCardRef = useRef(null);
+  const brideCardRef = useRef(null);
+
+  useEffect(() => {
+    const cleanGroom = groomCardRef.current ? attach3DParallaxTilt(groomCardRef.current, 6) : null;
+    const cleanBride = brideCardRef.current ? attach3DParallaxTilt(brideCardRef.current, 6) : null;
+
+    return () => {
+      if (cleanGroom) cleanGroom();
+      if (cleanBride) cleanBride();
+    };
+  }, []);
+
   return (
     <section 
       id="couple" 
@@ -16,7 +30,8 @@ export default function CoupleSection({ data }) {
         <div className="section-header reveal">
           <p className="section-label">THE COUPLE</p>
           <h2 className="section-title">Mempelai Yang Berbahagia</h2>
-          <BotanicalDivider />
+          <GorgaBatakOrnament size={46} />
+          <UlosRibbonDivider />
         </div>
 
         {/* Romantic Quote from Reference */}
@@ -30,9 +45,9 @@ export default function CoupleSection({ data }) {
         <div className="couple-container">
           
           {/* Mempelai Pria */}
-          <div className="couple-card reveal reveal-left">
-            <CornerFiligree position="top-left" />
-            <CornerFiligree position="bottom-right" />
+          <div ref={groomCardRef} className="couple-card reveal reveal-left">
+            <CornerGorgaFiligree position="top-left" />
+            <CornerGorgaFiligree position="bottom-right" />
 
             {/* Arched Cathedral Frame */}
             <div className="arched-photo-frame">
@@ -54,8 +69,8 @@ export default function CoupleSection({ data }) {
               <span className="couple-tag-badge">MEMPELAI PRIA</span>
               <h3 className="couple-name script-text">{data.groomFullName || 'Yenricho Noprian T Silaban'}</h3>
               <div className="parent-info-batak">
-                <p>Putra tercinta dari:</p>
-                <p><strong>{data.groomParents || 'Bapak Silaban & Ibu Br. Sitompul'}</strong></p>
+                <p>{data.groomChildOrder || 'Putra pertama dari:'}</p>
+                <p><strong>{(!data.groomParents || data.groomParents.includes('...')) ? 'Bapak B. Silaban & Ibu R. Panjaitan' : data.groomParents}</strong></p>
               </div>
             </div>
           </div>
@@ -69,9 +84,9 @@ export default function CoupleSection({ data }) {
           </div>
 
           {/* Mempelai Wanita */}
-          <div className="couple-card reveal reveal-right">
-            <CornerFiligree position="top-right" />
-            <CornerFiligree position="bottom-left" />
+          <div ref={brideCardRef} className="couple-card reveal reveal-right">
+            <CornerGorgaFiligree position="top-right" />
+            <CornerGorgaFiligree position="bottom-left" />
 
             {/* Arched Cathedral Frame */}
             <div className="arched-photo-frame">
@@ -93,13 +108,16 @@ export default function CoupleSection({ data }) {
               <span className="couple-tag-badge">MEMPELAI WANITA</span>
               <h3 className="couple-name script-text">{data.brideFullName || 'Veni Gracia Br Sitanggang, S.Pd'}</h3>
               <div className="parent-info-batak">
-                <p>Putri tercinta dari:</p>
-                <p><strong>{data.brideParents || 'Bapak Sitanggang & Ibu Br. Sinambela'}</strong></p>
+                <p>{data.brideChildOrder || 'Putri terakhir dari:'}</p>
+                <p><strong>{(!data.brideParents || data.brideParents.includes('...')) ? 'Bapak A. Sitanggang & Ibu R. Manurung' : data.brideParents}</strong></p>
               </div>
             </div>
           </div>
 
         </div>
+
+        {/* Section Bottom Ulos Divider */}
+        <UlosRibbonDivider className="mt-8" />
       </div>
     </section>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ZoomIn, X, ChevronLeft, ChevronRight, Play, Pause, Maximize2, Sparkles, Heart } from 'lucide-react';
-import { BotanicalDivider, CornerFiligree } from './Ornaments';
+import { UlosRibbonDivider, GorgaBatakOrnament, CornerGorgaFiligree } from './Ornaments';
 
 export default function GallerySection() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -65,13 +65,13 @@ export default function GallerySection() {
       src: '/assets/images/foto laki laki sendiri.jpeg', 
       title: 'Yenricho Noprian T Silaban', 
       tag: 'Mempelai Pria',
-      caption: 'Putra tercinta keluarga Silaban yang siap memimpin bahtera rumah tangga.' 
+      caption: 'Putra pertama dari Bapak B. Silaban & Ibu R. Panjaitan yang siap memimpin bahtera rumah tangga.' 
     },
     { 
       src: '/assets/images/foto perempuan sendiri.jpeg', 
       title: 'Veni Gracia Br Sitanggang, S.Pd', 
       tag: 'Mempelai Wanita',
-      caption: 'Putri tercinta keluarga Sitanggang yang anggun, setia, dan berbudi luhur.' 
+      caption: 'Putri terakhir dari Bapak A. Sitanggang & Ibu R. Manurung yang anggun, setia, dan berbudi luhur.' 
     },
     { 
       src: '/assets/images/26.jpeg', 
@@ -238,7 +238,8 @@ export default function GallerySection() {
         <div className="section-header reveal">
           <p className="section-label">OUR MOMENTS</p>
           <h2 className="section-title">Galeri Foto Prewedding</h2>
-          <BotanicalDivider />
+          <GorgaBatakOrnament size={46} />
+          <UlosRibbonDivider />
           <p className="gallery-subtitle">
             Potret sakral, adat, dan kebersamaan cinta Yenricho & Veni
           </p>
@@ -251,10 +252,10 @@ export default function GallerySection() {
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          <CornerFiligree position="top-left" />
-          <CornerFiligree position="top-right" />
-          <CornerFiligree position="bottom-left" />
-          <CornerFiligree position="bottom-right" />
+          <CornerGorgaFiligree position="top-left" />
+          <CornerGorgaFiligree position="top-right" />
+          <CornerGorgaFiligree position="bottom-left" />
+          <CornerGorgaFiligree position="bottom-right" />
 
           {/* Main Slide Image */}
           <div 

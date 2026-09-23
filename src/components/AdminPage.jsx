@@ -683,6 +683,30 @@ export default function AdminPage({
 
               <div className="form-grid-2 mt-4">
                 <div className="form-group">
+                  <label className="admin-label">Orang Tua Pria ({data.groomChildOrder || 'Putra pertama'}):</label>
+                  <input 
+                    type="text" 
+                    value={data.groomParents || 'Bapak B. Silaban & Ibu R. Panjaitan'}
+                    onChange={(e) => handleFieldChange('groomParents', e.target.value)}
+                    className="admin-input"
+                  />
+                  <span className="input-hint">Default: Bapak B. Silaban & Ibu R. Panjaitan</span>
+                </div>
+
+                <div className="form-group">
+                  <label className="admin-label">Orang Tua Wanita ({data.brideChildOrder || 'Putri terakhir'}):</label>
+                  <input 
+                    type="text" 
+                    value={data.brideParents || 'Bapak A. Sitanggang & Ibu R. Manurung'}
+                    onChange={(e) => handleFieldChange('brideParents', e.target.value)}
+                    className="admin-input"
+                  />
+                  <span className="input-hint">Default: Bapak A. Sitanggang & Ibu R. Manurung</span>
+                </div>
+              </div>
+
+              <div className="form-grid-2 mt-4">
+                <div className="form-group">
                   <label className="admin-label">Nama Pengirim Amplop (Opsional):</label>
                   <input 
                     type="text" 

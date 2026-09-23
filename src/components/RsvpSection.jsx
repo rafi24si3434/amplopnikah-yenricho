@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User, CheckCircle, XCircle, HelpCircle, Users, Send, HeartHandshake, Church, PartyPopper } from 'lucide-react';
-import { BotanicalDivider } from './Ornaments';
+import { UlosRibbonDivider, GorgaBatakOrnament, CornerGorgaFiligree } from './Ornaments';
 
 export default function RsvpSection({ defaultName }) {
   const [name, setName] = useState(defaultName || '');
@@ -43,11 +43,14 @@ export default function RsvpSection({ defaultName }) {
         <div className="section-header reveal">
           <p className="section-label">RSVP & KEHADIRAN</p>
           <h2 className="section-title">Konfirmasi Kehadiran</h2>
-          <BotanicalDivider />
+          <GorgaBatakOrnament size={44} />
+          <UlosRibbonDivider />
         </div>
 
         <div className="rsvp-container reveal">
           <div className="rsvp-card glass-card">
+            <CornerGorgaFiligree position="top-left" />
+            <CornerGorgaFiligree position="bottom-right" />
             {!submitted ? (
               <form onSubmit={handleSubmit} id="rsvp-form">
                 
