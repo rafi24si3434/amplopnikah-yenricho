@@ -3,10 +3,25 @@ import {
   Users, Edit3, Share2, CreditCard, Printer, Download, ExternalLink, 
   RotateCcw, Sparkles, Plus, Trash2, Check, Copy, MessageCircle, 
   QrCode, FileSpreadsheet, CheckCircle2, Clock, Search, ArrowLeft, 
-  Gift, Building2, Heart, Send, X, Eye, FileText, Package, Truck
+  Gift, Building2, Heart, Send, X, Eye, FileText, Package, Truck,
+  LogOut, CalendarCheck, MessageSquareHeart, CheckCircle, XCircle, HelpCircle
 } from 'lucide-react';
 import { MonogramCrest } from './Ornaments';
-import { fetchGiftConfirmationsFromSupabase, deleteGiftConfirmationFromSupabase } from '../utils/supabaseClient';
+import { 
+  supabase,
+  fetchGiftConfirmationsFromSupabase, 
+  deleteGiftConfirmationFromSupabase,
+  fetchRsvpsFromSupabase,
+  deleteRsvpFromSupabase,
+  fetchWishesFromSupabase,
+  deleteWishFromSupabase,
+  saveGuestListToSupabase,
+  deleteGuestFromSupabase,
+  updateGuestSentStatusInSupabase,
+  saveBulkListToSupabase,
+  saveWeddingSettingsToSupabase,
+  fetchGuestsFromSupabase
+} from '../utils/supabaseClient';
 
 export default function AdminPage({
   data,
@@ -22,7 +37,8 @@ export default function AdminPage({
   onExportSinglePdf,
   onExportBulkPdf,
   isExporting,
-  onExitAdmin
+  onExitAdmin,
+  onLogout
 }) {
   const [activeTab, setActiveTab] = useState('share'); // 'share', 'guests', 'couple', 'bank', 'print'
   const [searchQuery, setSearchQuery] = useState('');
@@ -54,6 +70,15 @@ export default function AdminPage({
     return [];
   });
 
+  // RSVPs tracker (Supabase Cloud Realtime)
+  const [rsvps, setRsvps] = useState([]);
+  const [rsvpFilter, setRsvpFilter] = useState('all'); // 'all', 'hadir', 'ragu', 'tidak'
+  const [rsvpSearch, setRsvpSearch] = useState('');
+
+  // Wishes tracker (Supabase Cloud Realtime)
+  const [wishes, setWishes] = useState([]);
+  const [wishesSearch, setWishesSearch] = useState('');
+
   useEffect(() => {
     const handleGiftUpdate = (e) => {
       if (e.detail) {
@@ -62,22 +87,65 @@ export default function AdminPage({
     };
     window.addEventListener('gift-confirmation-updated', handleGiftUpdate);
 
-    // Fetch from Supabase Cloud
+    // Initial Load All Cloud Data
     let isMounted = true;
-    async function loadCloudGifts() {
-      const remote = await fetchGiftConfirmationsFromSupabase();
-      if (isMounted && remote && remote.length > 0) {
-        setGiftConfirmations(remote);
-        try {
-          localStorage.setItem('wedding_gift_confirmations', JSON.stringify(remote));
-        } catch (e) {}
+    async function loadAllCloudData() {
+      try {
+        const [cloudGifts, cloudRsvps, cloudWishes] = await Promise.all([
+          fetchGiftConfirmationsFromSupabase(),
+          fetchRsvpsFromSupabase(),
+          fetchWishesFromSupabase()
+        ]);
+
+        if (isMounted) {
+          if (cloudGifts && cloudGifts.length > 0) {
+            setGiftConfirmations(cloudGifts);
+            try {
+              localStorage.setItem('wedding_gift_confirmations', JSON.stringify(cloudGifts));
+            } catch (e) {}
+          }
+          if (cloudRsvps) setRsvps(cloudRsvps);
+          if (cloudWishes) setWishes(cloudWishes);
+        }
+      } catch (err) {
+        console.warn('Error fetching admin data:', err);
       }
     }
-    loadCloudGifts();
+    loadAllCloudData();
+
+    // Supabase Realtime Listener (Live Data Stream)
+    const realtimeHub = supabase
+      .channel('admin:realtime-hub')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'gift_confirmations' }, async () => {
+        const updated = await fetchGiftConfirmationsFromSupabase();
+        if (updated) {
+          setGiftConfirmations(updated);
+          try {
+            localStorage.setItem('wedding_gift_confirmations', JSON.stringify(updated));
+          } catch (e) {}
+        }
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'rsvps' }, async () => {
+        const updated = await fetchRsvpsFromSupabase();
+        if (updated) setRsvps(updated);
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'wishes' }, async () => {
+        const updated = await fetchWishesFromSupabase();
+        if (updated) setWishes(updated);
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'guest_list' }, async () => {
+        const updated = await fetchGuestsFromSupabase();
+        if (updated?.list) {
+          setGuestList(updated.list);
+          if (updated.sentMap) setSentStatus(updated.sentMap);
+        }
+      })
+      .subscribe();
 
     return () => {
       isMounted = false;
       window.removeEventListener('gift-confirmation-updated', handleGiftUpdate);
+      supabase.removeChannel(realtimeHub);
     };
   }, []);
 
@@ -95,7 +163,7 @@ export default function AdminPage({
       const origin = window.location.origin;
       return `${origin}/`;
     }
-    return 'https://amplopnikah-yenricho.vercel.app/';
+    return 'https://weedingyenrichoveni.online/';
   };
 
   const generateGuestLink = (guestName) => {
@@ -141,10 +209,12 @@ export default function AdminPage({
 
   const toggleSentStatus = (guestName, forceVal) => {
     setSentStatus(prev => {
-      const next = { ...prev, [guestName]: forceVal !== undefined ? forceVal : !prev[guestName] };
+      const nextVal = forceVal !== undefined ? forceVal : !prev[guestName];
+      const next = { ...prev, [guestName]: nextVal };
       try {
         localStorage.setItem('amplop_sent_status', JSON.stringify(next));
       } catch (e) {}
+      updateGuestSentStatusInSupabase(guestName, nextVal);
       return next;
     });
   };
@@ -200,6 +270,8 @@ export default function AdminPage({
     setBulkList(updated);
     setBulkTextInput(updated.join('\n'));
     setNewGuestInput('');
+    saveBulkListToSupabase(updated);
+    saveGuestListToSupabase([trimmed]);
     triggerToast(`"${trimmed}" berhasil ditambahkan!`);
   };
 
@@ -209,6 +281,8 @@ export default function AdminPage({
     const updated = bulkList.filter((_, i) => i !== indexToDelete);
     setBulkList(updated);
     setBulkTextInput(updated.join('\n'));
+    saveBulkListToSupabase(updated);
+    deleteGuestFromSupabase(targetName);
     triggerToast(`"${targetName}" telah dihapus.`);
   };
 
@@ -225,20 +299,105 @@ export default function AdminPage({
     }
 
     setBulkList(lines);
+    saveBulkListToSupabase(lines);
+    saveGuestListToSupabase(lines);
     triggerToast(`Berhasil memperbarui ${lines.length} nama tamu!`);
   };
 
   // Handle data updates
   const handleFieldChange = (field, value) => {
-    setData(prev => ({ ...prev, [field]: value }));
+    setData(prev => {
+      const next = { ...prev, [field]: value };
+      saveWeddingSettingsToSupabase(next);
+      return next;
+    });
   };
 
   const handleBankChange = (index, field, value) => {
     setData(prev => {
       const updated = [...prev.bankAccounts];
       updated[index] = { ...updated[index], [field]: value };
-      return { ...prev, bankAccounts: updated };
+      const next = { ...prev, bankAccounts: updated };
+      saveWeddingSettingsToSupabase(next);
+      return next;
     });
+  };
+
+  // RSVP Management Handlers
+  const handleDeleteRsvp = async (id, guestName) => {
+    if (window.confirm(`Hapus konfirmasi RSVP dari "${guestName}"?`)) {
+      const filtered = rsvps.filter(r => r.id !== id);
+      setRsvps(filtered);
+      await deleteRsvpFromSupabase(id);
+      triggerToast(`RSVP dari "${guestName}" berhasil dihapus.`);
+    }
+  };
+
+  const downloadRsvpCsv = () => {
+    if (rsvps.length === 0) {
+      triggerToast('Belum ada data konfirmasi RSVP!');
+      return;
+    }
+    const rows = [
+      ['No', 'Nama Tamu', 'Status Kehadiran', 'Acara', 'Jumlah Tamu (Pax)', 'No. WhatsApp', 'Catatan', 'Waktu Konfirmasi'],
+      ...rsvps.map((r, i) => [
+        i + 1,
+        `"${(r.guest_name || '').replace(/"/g, '""')}"`,
+        r.attendance === 'hadir' ? 'Hadir' : r.attendance === 'ragu' ? 'Masih Ragu' : 'Tidak Hadir',
+        r.event_choice || 'Keduanya',
+        r.guests_count || 1,
+        `"${(r.phone || '-').replace(/"/g, '""')}"`,
+        `"${(r.notes || '-').replace(/"/g, '""')}"`,
+        `"${new Date(r.created_at).toLocaleString('id-ID')}"`
+      ])
+    ];
+    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + rows.map(e => e.join(',')).join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `rekap_rsvp_kehadiran_${rsvps.length}_tamu.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    triggerToast('Rekap RSVP Excel/CSV berhasil diunduh!');
+  };
+
+  // Wishes Management Handlers
+  const handleDeleteWish = async (id, senderName) => {
+    if (window.confirm(`Hapus ucapan doa dari "${senderName}"?`)) {
+      const filtered = wishes.filter(w => w.id !== id);
+      setWishes(filtered);
+      try {
+        localStorage.setItem('wedding_wishes', JSON.stringify(filtered));
+      } catch (e) {}
+      await deleteWishFromSupabase(id);
+      triggerToast(`Ucapan dari "${senderName}" berhasil dihapus.`);
+    }
+  };
+
+  const downloadWishesCsv = () => {
+    if (wishes.length === 0) {
+      triggerToast('Belum ada doa dan ucapan!');
+      return;
+    }
+    const rows = [
+      ['No', 'Nama Pengirim', 'Doa & Ucapan', 'Waktu'],
+      ...wishes.map((w, i) => [
+        i + 1,
+        `"${(w.name || '').replace(/"/g, '""')}"`,
+        `"${(w.message || '').replace(/"/g, '""')}"`,
+        `"${new Date(w.time).toLocaleString('id-ID')}"`
+      ])
+    ];
+    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + rows.map(e => e.join(',')).join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `rekap_doa_ucapan_${wishes.length}_tamu.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    triggerToast('Rekap Doa & Ucapan Excel/CSV berhasil diunduh!');
   };
 
   const groomInit = (data.groomName || 'Y').charAt(0).toUpperCase();
@@ -271,6 +430,12 @@ export default function AdminPage({
           </div>
 
           <div className="admin-header-actions">
+            {/* Supabase Live Realtime Indicator */}
+            <div className="admin-realtime-badge" title="Tersambung langsung & realtime ke database cloud Supabase">
+              <span className="realtime-pulse-dot"></span>
+              <span className="realtime-text">Cloud Realtime Aktif</span>
+            </div>
+
             <button 
               className="btn-admin-action secondary"
               onClick={onResetData}
@@ -288,6 +453,17 @@ export default function AdminPage({
               <Eye size={16} />
               <span>Lihat Undangan Tamu</span>
             </button>
+
+            {onLogout && (
+              <button 
+                className="btn-admin-action danger-logout"
+                onClick={onLogout}
+                title="Keluar dari akun admin"
+              >
+                <LogOut size={15} />
+                <span>Keluar</span>
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -297,7 +473,7 @@ export default function AdminPage({
         
         {/* Quick Stats Bar */}
         <div className="admin-stats-grid">
-          <div className="stat-card">
+          <div className="stat-card cursor-pointer" onClick={() => setActiveTab('guests')} style={{ cursor: 'pointer' }}>
             <div className="stat-icon-circle total">
               <Users size={22} />
             </div>
@@ -307,33 +483,42 @@ export default function AdminPage({
             </div>
           </div>
 
-          <div className="stat-card">
+          <div className="stat-card cursor-pointer" onClick={() => setActiveTab('share')} style={{ cursor: 'pointer' }}>
             <div className="stat-icon-circle sent">
               <CheckCircle2 size={22} />
             </div>
             <div>
               <span className="stat-number">{totalSentCount}</span>
               <span className="stat-label">Sudah Terkirim</span>
+              <div className="stat-subtext" style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                {totalUnsentCount} belum dikirim
+              </div>
             </div>
           </div>
 
-          <div className="stat-card">
-            <div className="stat-icon-circle unsent">
-              <Clock size={22} />
+          <div className="stat-card cursor-pointer" onClick={() => setActiveTab('rsvps')} style={{ cursor: 'pointer' }} title="Klik untuk melihat rekap kehadiran tamu">
+            <div className="stat-icon-circle" style={{ background: '#ecfdf5', color: '#059669' }}>
+              <CalendarCheck size={22} />
             </div>
             <div>
-              <span className="stat-number">{totalUnsentCount}</span>
-              <span className="stat-label">Belum Terkirim</span>
+              <span className="stat-number">{rsvps.length}</span>
+              <span className="stat-label">Konfirmasi RSVP</span>
+              <div className="stat-subtext" style={{ fontSize: '0.72rem', color: '#10b981', marginTop: '2px' }}>
+                {rsvps.filter(r => r.attendance === 'hadir').length} Hadir • {rsvps.filter(r => r.attendance === 'ragu').length} Ragu • {rsvps.filter(r => r.attendance === 'tidak').length} Tidak
+              </div>
             </div>
           </div>
 
-          <div className="stat-card">
-            <div className="stat-icon-circle bank">
-              <CreditCard size={22} />
+          <div className="stat-card cursor-pointer" onClick={() => setActiveTab('wishes')} style={{ cursor: 'pointer' }} title="Klik untuk melihat doa dan ucapan tamu">
+            <div className="stat-icon-circle" style={{ background: '#fdf2f8', color: '#db2777' }}>
+              <MessageSquareHeart size={22} />
             </div>
             <div>
-              <span className="stat-number">{data.bankAccounts.length}</span>
-              <span className="stat-label">Rekening Bank Aktif</span>
+              <span className="stat-number">{wishes.length}</span>
+              <span className="stat-label">Doa & Ucapan Tamu</span>
+              <div className="stat-subtext" style={{ fontSize: '0.72rem', color: '#db2777', marginTop: '2px' }}>
+                Live dari Buku Tamu
+              </div>
             </div>
           </div>
 
@@ -344,6 +529,19 @@ export default function AdminPage({
             <div>
               <span className="stat-number">{giftConfirmations.length}</span>
               <span className="stat-label">Kado Dikonfirmasi</span>
+              <div className="stat-subtext" style={{ fontSize: '0.72rem', color: '#b45309', marginTop: '2px' }}>
+                Resi & Pengiriman
+              </div>
+            </div>
+          </div>
+
+          <div className="stat-card cursor-pointer" onClick={() => setActiveTab('bank')} style={{ cursor: 'pointer' }}>
+            <div className="stat-icon-circle bank">
+              <CreditCard size={22} />
+            </div>
+            <div>
+              <span className="stat-number">{data.bankAccounts?.length || 0}</span>
+              <span className="stat-label">Rekening Bank Aktif</span>
             </div>
           </div>
         </div>
@@ -367,19 +565,19 @@ export default function AdminPage({
           </button>
 
           <button 
-            className={`admin-nav-tab ${activeTab === 'couple' ? 'active' : ''}`}
-            onClick={() => setActiveTab('couple')}
+            className={`admin-nav-tab ${activeTab === 'rsvps' ? 'active' : ''}`}
+            onClick={() => setActiveTab('rsvps')}
           >
-            <Heart size={16} />
-            <span>Nama Kedua Mempelai</span>
+            <CalendarCheck size={16} />
+            <span>RSVP Kehadiran ({rsvps.length})</span>
           </button>
 
           <button 
-            className={`admin-nav-tab ${activeTab === 'bank' ? 'active' : ''}`}
-            onClick={() => setActiveTab('bank')}
+            className={`admin-nav-tab ${activeTab === 'wishes' ? 'active' : ''}`}
+            onClick={() => setActiveTab('wishes')}
           >
-            <CreditCard size={16} />
-            <span>Rekening & Alamat</span>
+            <MessageSquareHeart size={16} />
+            <span>Doa & Ucapan ({wishes.length})</span>
           </button>
 
           <button 
@@ -388,6 +586,22 @@ export default function AdminPage({
           >
             <Package size={16} />
             <span>Kado Masuk ({giftConfirmations.length})</span>
+          </button>
+
+          <button 
+            className={`admin-nav-tab ${activeTab === 'couple' ? 'active' : ''}`}
+            onClick={() => setActiveTab('couple')}
+          >
+            <Heart size={16} />
+            <span>Nama Mempelai</span>
+          </button>
+
+          <button 
+            className={`admin-nav-tab ${activeTab === 'bank' ? 'active' : ''}`}
+            onClick={() => setActiveTab('bank')}
+          >
+            <CreditCard size={16} />
+            <span>Rekening & Alamat</span>
           </button>
 
           <button 
@@ -696,6 +910,349 @@ export default function AdminPage({
                 </div>
               </div>
 
+            </div>
+          </div>
+        )}
+
+        {/* TAB: RSVP & KEHADIRAN TAMU */}
+        {activeTab === 'rsvps' && (
+          <div className="admin-tab-pane">
+            <div className="admin-card">
+              <div className="admin-tab-header-flex">
+                <div>
+                  <h3 className="card-section-title">
+                    <CalendarCheck size={20} className="gold-text" />
+                    Daftar Konfirmasi Kehadiran Tamu (RSVP)
+                  </h3>
+                  <p className="card-desc">
+                    Data realtime tamu yang telah mengisi konfirmasi kehadiran pada formulir RSVP di website.
+                  </p>
+                </div>
+
+                <div className="header-actions-group">
+                  <button 
+                    className="btn-adm-secondary"
+                    onClick={downloadRsvpCsv}
+                    title="Export seluruh data RSVP ke file Excel/CSV"
+                  >
+                    <Download size={15} />
+                    <span>Download Rekap CSV</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* RSVP Summary Metric Cards */}
+              <div className="rsvp-metrics-grid">
+                <div className="rsvp-metric-pill total">
+                  <span className="metric-val">{rsvps.length}</span>
+                  <span className="metric-lbl">Total Respon</span>
+                </div>
+                <div className="rsvp-metric-pill hadir">
+                  <span className="metric-val">
+                    {rsvps.filter(r => r.attendance === 'hadir').length}
+                  </span>
+                  <span className="metric-lbl">Pasti Hadir</span>
+                </div>
+                <div className="rsvp-metric-pill pax">
+                  <span className="metric-val">
+                    {rsvps
+                      .filter(r => r.attendance === 'hadir')
+                      .reduce((sum, r) => sum + (parseInt(r.guests_count, 10) || 1), 0)}
+                  </span>
+                  <span className="metric-lbl">Est. Total Orang (Pax)</span>
+                </div>
+                <div className="rsvp-metric-pill ragu">
+                  <span className="metric-val">
+                    {rsvps.filter(r => r.attendance === 'ragu').length}
+                  </span>
+                  <span className="metric-lbl">Masih Ragu</span>
+                </div>
+                <div className="rsvp-metric-pill tidak">
+                  <span className="metric-val">
+                    {rsvps.filter(r => r.attendance === 'tidak').length}
+                  </span>
+                  <span className="metric-lbl">Berhalangan</span>
+                </div>
+              </div>
+
+              {/* Filter & Search Bar */}
+              <div className="rsvp-filter-toolbar">
+                <div className="rsvp-filter-buttons">
+                  <button 
+                    className={`rsvp-filter-btn ${rsvpFilter === 'all' ? 'active' : ''}`}
+                    onClick={() => setRsvpFilter('all')}
+                  >
+                    Semua ({rsvps.length})
+                  </button>
+                  <button 
+                    className={`rsvp-filter-btn hadir ${rsvpFilter === 'hadir' ? 'active' : ''}`}
+                    onClick={() => setRsvpFilter('hadir')}
+                  >
+                    Hadir ({rsvps.filter(r => r.attendance === 'hadir').length})
+                  </button>
+                  <button 
+                    className={`rsvp-filter-btn ragu ${rsvpFilter === 'ragu' ? 'active' : ''}`}
+                    onClick={() => setRsvpFilter('ragu')}
+                  >
+                    Ragu ({rsvps.filter(r => r.attendance === 'ragu').length})
+                  </button>
+                  <button 
+                    className={`rsvp-filter-btn tidak ${rsvpFilter === 'tidak' ? 'active' : ''}`}
+                    onClick={() => setRsvpFilter('tidak')}
+                  >
+                    Tidak Hadir ({rsvps.filter(r => r.attendance === 'tidak').length})
+                  </button>
+                </div>
+
+                <div className="admin-search-box rsvp-search">
+                  <Search size={16} />
+                  <input 
+                    type="text" 
+                    placeholder="Cari nama tamu, kontak, catatan..." 
+                    value={rsvpSearch}
+                    onChange={(e) => setRsvpSearch(e.target.value)}
+                    className="admin-search-input"
+                  />
+                  {rsvpSearch && (
+                    <button className="search-clear" onClick={() => setRsvpSearch('')}>
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* RSVP Table */}
+              {(() => {
+                const filteredRsvps = rsvps.filter(r => {
+                  const matchesFilter = rsvpFilter === 'all' || r.attendance === rsvpFilter;
+                  const query = rsvpSearch.toLowerCase();
+                  const matchesSearch = !rsvpSearch || 
+                    (r.guest_name && r.guest_name.toLowerCase().includes(query)) ||
+                    (r.phone && r.phone.toLowerCase().includes(query)) ||
+                    (r.notes && r.notes.toLowerCase().includes(query));
+                  return matchesFilter && matchesSearch;
+                });
+
+                if (filteredRsvps.length === 0) {
+                  return (
+                    <div className="empty-gift-notice" style={{ padding: '3rem 1.5rem', textAlign: 'center' }}>
+                      <CalendarCheck size={48} style={{ color: '#d4af37', margin: '0 auto 1rem', display: 'block' }} />
+                      <h4 style={{ fontSize: '1.15rem', marginBottom: '0.5rem', color: 'var(--batak-dark)' }}>
+                        {rsvps.length === 0 ? 'Belum Ada Konfirmasi RSVP' : 'Tidak Ada Data yang Cocok'}
+                      </h4>
+                      <p style={{ maxWidth: '460px', margin: '0 auto', fontSize: '0.88rem', color: 'var(--text-muted)' }}>
+                        {rsvps.length === 0 
+                          ? 'Ketika tamu mengisi formulir RSVP di website, konfirmasi kehadiran mereka akan otomatis tampil secara live di tabel ini.'
+                          : 'Coba ubah kata kunci pencarian atau filter status kehadiran di atas.'}
+                      </p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="admin-table-wrap">
+                    <table className="admin-table">
+                      <thead>
+                        <tr>
+                          <th style={{ width: '50px' }}>No</th>
+                          <th>Nama Tamu</th>
+                          <th style={{ width: '130px' }}>Status</th>
+                          <th style={{ width: '110px' }}>Jumlah Tamu</th>
+                          <th style={{ width: '140px' }}>Pilihan Acara</th>
+                          <th>No. WhatsApp</th>
+                          <th>Catatan Tamu</th>
+                          <th style={{ width: '150px' }}>Waktu Konfirmasi</th>
+                          <th style={{ width: '90px', textAlign: 'center' }}>Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredRsvps.map((rsvp, idx) => {
+                          const attendanceConfig = {
+                            hadir: { label: 'Hadir', badgeClass: 'badge-hadir', icon: <CheckCircle size={13} /> },
+                            ragu: { label: 'Masih Ragu', badgeClass: 'badge-ragu', icon: <HelpCircle size={13} /> },
+                            tidak: { label: 'Tidak Hadir', badgeClass: 'badge-tidak', icon: <XCircle size={13} /> }
+                          }[rsvp.attendance] || { label: rsvp.attendance, badgeClass: '', icon: null };
+
+                          const eventLabel = {
+                            pemberkatan: 'Pemberkatan',
+                            resepsi: 'Resepsi Adat',
+                            keduanya: 'Keduanya'
+                          }[rsvp.event_choice] || rsvp.event_choice || 'Keduanya';
+
+                          return (
+                            <tr key={rsvp.id || idx}>
+                              <td className="cell-num">{idx + 1}</td>
+                              <td className="cell-name">
+                                <strong className="guest-display-name">{rsvp.guest_name}</strong>
+                              </td>
+                              <td>
+                                <span className={`status-pill-attendance ${attendanceConfig.badgeClass}`}>
+                                  {attendanceConfig.icon}
+                                  <span>{attendanceConfig.label}</span>
+                                </span>
+                              </td>
+                              <td className="cell-center">
+                                <span className="pax-badge">
+                                  {rsvp.guests_count || 1} orang
+                                </span>
+                              </td>
+                              <td>
+                                <span className="event-choice-tag">{eventLabel}</span>
+                              </td>
+                              <td>
+                                {rsvp.phone ? (
+                                  <a 
+                                    href={`https://wa.me/62${rsvp.phone.replace(/^0/, '').replace(/\D/g, '')}?text=Halo%20${encodeURIComponent(rsvp.guest_name)},%20kami%20Yenricho%20%26%20Veni%20terima%20kasih%20atas%20konfirmasi%20kehadirannya...`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="wa-link-btn"
+                                  >
+                                    <MessageCircle size={13} />
+                                    <span>{rsvp.phone}</span>
+                                  </a>
+                                ) : (
+                                  <span className="text-muted text-xs">-</span>
+                                )}
+                              </td>
+                              <td>
+                                {rsvp.notes ? (
+                                  <span className="rsvp-notes-text" title={rsvp.notes}>
+                                    "{rsvp.notes}"
+                                  </span>
+                                ) : (
+                                  <span className="text-muted text-xs">-</span>
+                                )}
+                              </td>
+                              <td className="cell-date">
+                                <span className="text-xs">
+                                  {rsvp.created_at ? new Date(rsvp.created_at).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'}
+                                </span>
+                              </td>
+                              <td className="cell-actions">
+                                <button 
+                                  className="btn-adm-mini danger"
+                                  onClick={() => handleDeleteRsvp(rsvp.id, rsvp.guest_name)}
+                                  title="Hapus data RSVP ini"
+                                >
+                                  <Trash2 size={13} />
+                                  <span>Hapus</span>
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        )}
+
+        {/* TAB: DOA & UCAPAN TAMU */}
+        {activeTab === 'wishes' && (
+          <div className="admin-tab-pane">
+            <div className="admin-card">
+              <div className="admin-tab-header-flex">
+                <div>
+                  <h3 className="card-section-title">
+                    <MessageSquareHeart size={20} className="gold-text" />
+                    Daftar Doa & Ucapan Tamu Undangan ({wishes.length})
+                  </h3>
+                  <p className="card-desc">
+                    Doa restu, ucapan selamat, dan pesan penuh kasih yang dikirim oleh tamu di website secara realtime.
+                  </p>
+                </div>
+
+                <div className="header-actions-group">
+                  <button 
+                    className="btn-adm-secondary"
+                    onClick={downloadWishesCsv}
+                    title="Export seluruh doa dan ucapan ke file Excel/CSV"
+                  >
+                    <Download size={15} />
+                    <span>Download Rekap CSV</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Search Wishes */}
+              <div className="admin-search-box mb-4">
+                <Search size={16} />
+                <input 
+                  type="text" 
+                  placeholder="Cari nama pengirim atau isi doa ucapan..." 
+                  value={wishesSearch}
+                  onChange={(e) => setWishesSearch(e.target.value)}
+                  className="admin-search-input"
+                />
+                {wishesSearch && (
+                  <button className="search-clear" onClick={() => setWishesSearch('')}>
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+
+              {/* Wishes List */}
+              {(() => {
+                const filteredWishes = wishes.filter(w => {
+                  const query = wishesSearch.toLowerCase();
+                  return !wishesSearch || 
+                    (w.name && w.name.toLowerCase().includes(query)) ||
+                    (w.message && w.message.toLowerCase().includes(query));
+                });
+
+                if (filteredWishes.length === 0) {
+                  return (
+                    <div className="empty-gift-notice" style={{ padding: '3rem 1.5rem', textAlign: 'center' }}>
+                      <MessageSquareHeart size={48} style={{ color: '#d4af37', margin: '0 auto 1rem', display: 'block' }} />
+                      <h4 style={{ fontSize: '1.15rem', marginBottom: '0.5rem', color: 'var(--batak-dark)' }}>
+                        {wishes.length === 0 ? 'Belum Ada Ucapan atau Doa' : 'Tidak Ada Ucapan yang Cocok'}
+                      </h4>
+                      <p style={{ maxWidth: '460px', margin: '0 auto', fontSize: '0.88rem', color: 'var(--text-muted)' }}>
+                        {wishes.length === 0
+                          ? 'Ucapan dan doa yang diisi oleh para tamu di buku tamu digital website akan langsung muncul secara realtime di sini.'
+                          : 'Coba ubah kata kunci pencarian Anda.'}
+                      </p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="admin-wishes-grid">
+                    {filteredWishes.map((w, idx) => (
+                      <div key={w.id || idx} className="admin-wish-card">
+                        <div className="admin-wish-top">
+                          <div className="admin-wish-author">
+                            <div className="admin-wish-avatar">
+                              {(w.name || 'T').charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <strong className="admin-wish-name">{w.name}</strong>
+                              <span className="admin-wish-time">
+                                {w.time ? new Date(w.time).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : ''}
+                              </span>
+                            </div>
+                          </div>
+
+                          <button 
+                            className="btn-adm-mini danger"
+                            onClick={() => handleDeleteWish(w.id, w.name)}
+                            title="Hapus ucapan ini"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+
+                        <div className="admin-wish-content">
+                          <p>"{w.message}"</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}

@@ -52,7 +52,7 @@ export default function NameEditorPanel({
     if (typeof window !== 'undefined') {
       return `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
     }
-    return 'https://amplopnikah.vercel.app/';
+    return 'https://weedingyenrichoveni.online/';
   };
 
   // Generate invitation link for a guest name

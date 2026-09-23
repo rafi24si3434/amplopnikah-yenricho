@@ -62,6 +62,25 @@ export async function insertWishToSupabase(name, message) {
   }
 }
 
+export async function deleteWishFromSupabase(id) {
+  try {
+    const { error } = await supabase
+      .from('wishes')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.warn('[Supabase] deleteWish warning:', error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.warn('[Supabase] deleteWish error:', err);
+    return false;
+  }
+}
+
+
 /**
  * =========================================================
  * 2. RSVP / KONFIRMASI KEHADIRAN
@@ -115,6 +134,24 @@ export async function fetchRsvpsFromSupabase() {
   } catch (err) {
     console.warn('[Supabase] fetchRsvps error:', err);
     return null;
+  }
+}
+
+export async function deleteRsvpFromSupabase(id) {
+  try {
+    const { error } = await supabase
+      .from('rsvps')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.warn('[Supabase] deleteRsvp warning:', error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.warn('[Supabase] deleteRsvp error:', err);
+    return false;
   }
 }
 
@@ -201,5 +238,175 @@ export async function deleteGiftConfirmationFromSupabase(id) {
   } catch (err) {
     console.warn('[Supabase] deleteGiftConfirmation error:', err);
     return false;
+  }
+}
+
+/**
+ * =========================================================
+ * 4. PENGATURAN UMUM MEMPELAI (WEDDING SETTINGS)
+ * =========================================================
+ */
+export async function fetchWeddingSettingsFromSupabase() {
+  try {
+    const { data, error } = await supabase
+      .from('wedding_settings')
+      .select('*')
+      .limit(1)
+      .maybeSingle();
+
+    if (error || !data) return null;
+
+    return {
+      groomName: data.groom_name,
+      groomFullName: data.groom_full_name,
+      groomChildOrder: data.groom_child_order,
+      groomParents: data.groom_parents,
+      brideName: data.bride_name,
+      brideFullName: data.bride_full_name,
+      brideChildOrder: data.bride_child_order,
+      brideParents: data.bride_parents,
+      senderName: data.sender_name,
+      recipientName: data.recipient_default_name || 'Bapak/Ibu/Saudara/i',
+      weddingDate: data.wedding_date,
+      weddingDateText: data.wedding_date_text,
+      musicVolume: data.music_volume ? parseFloat(data.music_volume) : 0.20
+    };
+  } catch (err) {
+    console.warn('[Supabase] fetchWeddingSettings error:', err);
+    return null;
+  }
+}
+
+export async function saveWeddingSettingsToSupabase(newData) {
+  try {
+    const payload = {
+      groom_name: newData.groomName,
+      groom_full_name: newData.groomFullName,
+      groom_child_order: newData.groomChildOrder,
+      groom_parents: newData.groomParents,
+      bride_name: newData.brideName,
+      bride_full_name: newData.brideFullName,
+      bride_child_order: newData.brideChildOrder,
+      bride_parents: newData.brideParents,
+      sender_name: newData.senderName,
+      wedding_date: newData.weddingDate,
+      wedding_date_text: newData.weddingDateText
+    };
+
+    const { data: existing } = await supabase.from('wedding_settings').select('id').limit(1).maybeSingle();
+    if (existing?.id) {
+      await supabase.from('wedding_settings').update(payload).eq('id', existing.id);
+    } else {
+      await supabase.from('wedding_settings').insert([payload]);
+    }
+    return true;
+  } catch (err) {
+    console.warn('[Supabase] saveWeddingSettings error:', err);
+    return false;
+  }
+}
+
+/**
+ * =========================================================
+ * 5. DAFTAR TAMU & STATUS PENGIRIMAN (GUEST LIST & SENT STATUS)
+ * =========================================================
+ */
+export async function fetchGuestsFromSupabase() {
+  try {
+    const { data, error } = await supabase
+      .from('guest_list')
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    if (error || !data || data.length === 0) return null;
+
+    const list = data.map(g => g.name);
+    const sentMap = {};
+    data.forEach(g => {
+      if (g.is_sent) {
+        sentMap[g.name] = true;
+      }
+    });
+
+    return { list, sentMap };
+  } catch (err) {
+    console.warn('[Supabase] fetchGuests error:', err);
+    return null;
+  }
+}
+
+export async function saveGuestListToSupabase(guests) {
+  try {
+    if (!Array.isArray(guests) || guests.length === 0) return;
+    for (const name of guests) {
+      const trimmed = name.trim();
+      if (!trimmed) continue;
+      const { data: existing } = await supabase
+        .from('guest_list')
+        .select('id')
+        .eq('name', trimmed)
+        .limit(1);
+
+      if (!existing || existing.length === 0) {
+        await supabase.from('guest_list').insert([{ name: trimmed }]);
+      }
+    }
+  } catch (err) {
+    console.warn('[Supabase] saveGuestList error:', err);
+  }
+}
+
+export async function deleteGuestFromSupabase(name) {
+  try {
+    await supabase.from('guest_list').delete().eq('name', name.trim());
+  } catch (err) {
+    console.warn('[Supabase] deleteGuest error:', err);
+  }
+}
+
+export async function updateGuestSentStatusInSupabase(guestName, isSent) {
+  try {
+    await supabase
+      .from('guest_list')
+      .update({ is_sent: !!isSent, sent_at: isSent ? new Date().toISOString() : null })
+      .eq('name', guestName.trim());
+  } catch (err) {
+    console.warn('[Supabase] updateGuestSentStatus error:', err);
+  }
+}
+
+/**
+ * =========================================================
+ * 6. DAFTAR NAMA AMPLOP MASSAL (BULK ENVELOPES)
+ * =========================================================
+ */
+export async function fetchBulkListFromSupabase() {
+  try {
+    const { data, error } = await supabase
+      .from('bulk_envelopes')
+      .select('name')
+      .order('order_index', { ascending: true });
+
+    if (error || !data || data.length === 0) return null;
+    return data.map(b => b.name);
+  } catch (err) {
+    console.warn('[Supabase] fetchBulkList error:', err);
+    return null;
+  }
+}
+
+export async function saveBulkListToSupabase(bulkList) {
+  try {
+    if (!Array.isArray(bulkList)) return;
+    await supabase.from('bulk_envelopes').delete().neq('name', '___impossible___');
+    const records = bulkList.map((name, index) => ({
+      name: name.trim(),
+      order_index: index + 1
+    }));
+    if (records.length > 0) {
+      await supabase.from('bulk_envelopes').insert(records);
+    }
+  } catch (err) {
+    console.warn('[Supabase] saveBulkList error:', err);
   }
 }

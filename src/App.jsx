@@ -15,9 +15,15 @@ import FloatingNav from './components/FloatingNav';
 import MusicPlayer from './components/MusicPlayer';
 import EnvelopePrintModal from './components/EnvelopePrintModal';
 import AdminPage from './components/AdminPage';
+import AdminLogin from './components/AdminLogin';
 import { exportElementToPdf, exportBulkToPdf } from './utils/pdfExport';
 import { triggerLuxuryWeddingConfetti } from './utils/confetti';
 import { initUlosShimmer, initBatakCursorTrail } from './utils/batakInteractions';
+import { 
+  fetchWeddingSettingsFromSupabase, 
+  fetchGuestsFromSupabase, 
+  fetchBulkListFromSupabase 
+} from './utils/supabaseClient';
 
 export default function App() {
   // Load data from localStorage or defaultData, prioritizing URL params if present
@@ -102,6 +108,13 @@ export default function App() {
   };
 
   const [isAdminView, setIsAdminView] = useState(checkIsAdmin);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
+    try {
+      return localStorage.getItem('wedding_admin_auth') === 'true';
+    } catch (e) {
+      return false;
+    }
+  });
 
   // Sync routing on browser popstate / hashchange
   useEffect(() => {
@@ -156,6 +169,36 @@ export default function App() {
     if (guestFromUrl) {
       setData(prev => ({ ...prev, recipientName: guestFromUrl }));
     }
+  }, []);
+
+  // Load cloud data from Supabase (Persistent across all devices & domains)
+  useEffect(() => {
+    let isMounted = true;
+    async function loadCloudData() {
+      try {
+        const cloudSettings = await fetchWeddingSettingsFromSupabase();
+        if (isMounted && cloudSettings) {
+          setData(prev => ({ ...prev, ...cloudSettings }));
+        }
+
+        const cloudGuests = await fetchGuestsFromSupabase();
+        if (isMounted && cloudGuests?.list && cloudGuests.list.length > 0) {
+          setGuestList(cloudGuests.list);
+        }
+
+        const cloudBulk = await fetchBulkListFromSupabase();
+        if (isMounted && cloudBulk && cloudBulk.length > 0) {
+          setBulkList(cloudBulk);
+        }
+      } catch (err) {
+        console.warn('Error loading Supabase cloud data:', err);
+      }
+    }
+    loadCloudData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Scroll reveal animation observer
@@ -277,6 +320,17 @@ export default function App() {
 
   // 1. DEDICATED ADMIN MANAGEMENT PAGE (/admin, ?admin, #admin)
   if (isAdminView) {
+    if (!isAdminAuthenticated) {
+      return (
+        <div className="wedding-app admin-view">
+          <AdminLogin 
+            onLoginSuccess={() => setIsAdminAuthenticated(true)}
+            onCancel={handleExitAdmin}
+          />
+        </div>
+      );
+    }
+
     return (
       <div className="wedding-app admin-view">
         <AdminPage 
@@ -294,6 +348,12 @@ export default function App() {
           onExportBulkPdf={handleExportBulkPdf}
           isExporting={isExporting}
           onExitAdmin={handleExitAdmin}
+          onLogout={() => {
+            try {
+              localStorage.removeItem('wedding_admin_auth');
+            } catch (e) {}
+            setIsAdminAuthenticated(false);
+          }}
         />
 
         {/* PRINTABLE ENVELOPE MODAL */}
