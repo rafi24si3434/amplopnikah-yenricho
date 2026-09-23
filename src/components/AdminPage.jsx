@@ -6,6 +6,7 @@ import {
   Gift, Building2, Heart, Send, X, Eye, FileText, Package, Truck
 } from 'lucide-react';
 import { MonogramCrest } from './Ornaments';
+import { fetchGiftConfirmationsFromSupabase, deleteGiftConfirmationFromSupabase } from '../utils/supabaseClient';
 
 export default function AdminPage({
   data,
@@ -60,7 +61,24 @@ export default function AdminPage({
       }
     };
     window.addEventListener('gift-confirmation-updated', handleGiftUpdate);
-    return () => window.removeEventListener('gift-confirmation-updated', handleGiftUpdate);
+
+    // Fetch from Supabase Cloud
+    let isMounted = true;
+    async function loadCloudGifts() {
+      const remote = await fetchGiftConfirmationsFromSupabase();
+      if (isMounted && remote && remote.length > 0) {
+        setGiftConfirmations(remote);
+        try {
+          localStorage.setItem('wedding_gift_confirmations', JSON.stringify(remote));
+        } catch (e) {}
+      }
+    }
+    loadCloudGifts();
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener('gift-confirmation-updated', handleGiftUpdate);
+    };
   }, []);
 
   const totalSentCount = bulkList.filter(guest => !!sentStatus[guest]).length;
@@ -925,6 +943,7 @@ export default function AdminPage({
                                 const filtered = giftConfirmations.filter(item => item.id !== g.id);
                                 setGiftConfirmations(filtered);
                                 localStorage.setItem('wedding_gift_confirmations', JSON.stringify(filtered));
+                                deleteGiftConfirmationFromSupabase(g.id);
                                 triggerToast('Catatan kado dihapus');
                               }
                             }}
@@ -1050,6 +1069,7 @@ export default function AdminPage({
                               const filtered = giftConfirmations.filter(item => item.id !== g.id);
                               setGiftConfirmations(filtered);
                               localStorage.setItem('wedding_gift_confirmations', JSON.stringify(filtered));
+                              deleteGiftConfirmationFromSupabase(g.id);
                               triggerToast('Catatan kado dihapus');
                             }
                           }}

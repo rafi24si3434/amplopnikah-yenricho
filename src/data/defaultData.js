@@ -87,17 +87,20 @@ export const defaultData = {
     {
       year: 'Awal 2023',
       title: 'Awal Mula Perkenalan',
-      desc: 'Kisah kami dimulai awal tahun 2023, dari sebuah perkenalan singkat melalui seorang teman. Awalnya, kami hanya bertegur sapa dan bertukar pesan secara santai, mencoba saling mengenal satu sama lain di tengah kesibukan masing-masing.'
+      desc: 'Kisah kami dimulai Awal tahun 2023, dari sebuah perkenalan singkat melalui seorang teman. Awalnya, kami hanya bertegur sapa dan bertukar pesan secara santai, mencoba saling mengenal satu sama lain di tengah kesibukan masing-masing.',
+      description: 'Kisah kami dimulai Awal tahun 2023, dari sebuah perkenalan singkat melalui seorang teman. Awalnya, kami hanya bertegur sapa dan bertukar pesan secara santai, mencoba saling mengenal satu sama lain di tengah kesibukan masing-masing.'
     },
     {
       year: 'Januari - April 2024',
-      title: 'Lost Contact & Menjalin Hubungan',
-      desc: 'Kami sempat kehilangan kontak dan berjalan di jalur masing-masing. Namun, takdir selalu punya cara untuk mempertemukan kembali. Memasuki Januari 2024, sebuah pesan singkat kembali membuka komunikasi. Percakapan hangat membawa kami pada tatap muka pertama di awal Februari 2024. Dan di bulan April 2024 kami memutuskan untuk menjalin hubungan, saling setia walaupun secara virtual dan bertemu sekali dalam 3 minggu.'
+      title: 'Lost Contact dan menjalin hubungan',
+      desc: 'Kami sempat kehilangan kontak dan berjalan di jalur masing-masing. Namun, jika memang sudah jalannya, takdir selalu punya cara untuk mempertemukan kembali. Memasuki  Januari Tahun 2024, sebuah pesan singkat kembali membuka komunikasi yang sempat terputus.\n\nPercakapan yang kembali mengalir hangat itu akhirnya membawa kami pada tatap muka pertama di awal Febuari Tahun 2024. Momen sederhana itu menjadi titik balik yang mengikis semua jarak dan rasa canggung. dan di bulan April tahun 2024 kami memutuskan untuk menjalin hubungan. Hari demi hari kami jalani bersama walaupun komunikasi  melalui virtual dan bertemu sekali dalam 3 minggu..',
+      description: 'Kami sempat kehilangan kontak dan berjalan di jalur masing-masing. Namun, jika memang sudah jalannya, takdir selalu punya cara untuk mempertemukan kembali. Memasuki  Januari Tahun 2024, sebuah pesan singkat kembali membuka komunikasi yang sempat terputus.\n\nPercakapan yang kembali mengalir hangat itu akhirnya membawa kami pada tatap muka pertama di awal Febuari Tahun 2024. Momen sederhana itu menjadi titik balik yang mengikis semua jarak dan rasa canggung. dan di bulan April tahun 2024 kami memutuskan untuk menjalin hubungan. Hari demi hari kami jalani bersama walaupun komunikasi  melalui virtual dan bertemu sekali dalam 3 minggu..'
     },
     {
       year: 'Januari - Oktober 2026',
       title: 'Melangkah ke Jenjang Pernikahan',
-      desc: 'Sejak hari itu, kami memutuskan untuk berjalan berdampingan hingga tumbuh rasa yakin bahwa kami telah menemukan pasangan hidup yang tepat. Memasuki Januari 2026 kami memutuskan untuk melangkah ke jenjang yang lebih serius: mengikat janji suci pernikahan di awal Oktober 2026.'
+      desc: 'Sejak hari itu, kami memutuskan untuk berjalan berdampingan. Menjalani hari-hari bersama, saling mengenal lebih dalam, hingga tumbuh rasa yakin bahwa kami telah menemukan pasangan hidup yang tepat. Setelah melalui proses bertumbuh bersama, kini dengan penuh rasa syukur dan mantap, lalu januari 2026 kami memutuskan untuk melangkah ke jenjang yang lebih serius: mengikat janji suci pernikahan di awal Oktober 2026 .',
+      description: 'Sejak hari itu, kami memutuskan untuk berjalan berdampingan. Menjalani hari-hari bersama, saling mengenal lebih dalam, hingga tumbuh rasa yakin bahwa kami telah menemukan pasangan hidup yang tepat. Setelah melalui proses bertumbuh bersama, kini dengan penuh rasa syukur dan mantap, lalu januari 2026 kami memutuskan untuk melangkah ke jenjang yang lebih serius: mengikat janji suci pernikahan di awal Oktober 2026 .'
     }
   ],
 

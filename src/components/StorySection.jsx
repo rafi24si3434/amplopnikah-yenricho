@@ -93,7 +93,7 @@ export default function StorySection({ stories }) {
 
                     <h3 className="story-title">{story.title}</h3>
                     <p className="story-subtitle">{photoData.subtitle}</p>
-                    <p className="story-desc">{story.description}</p>
+                    <p className="story-desc">{story.description || story.desc}</p>
                   </div>
                 </div>
               </div>

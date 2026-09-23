@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User, CheckCircle, XCircle, HelpCircle, Users, Send, HeartHandshake, Church, PartyPopper } from 'lucide-react';
 import { UlosRibbonDivider, GorgaBatakOrnament, CornerGorgaFiligree } from './Ornaments';
+import { insertRsvpToSupabase } from '../utils/supabaseClient';
 
 export default function RsvpSection({ defaultName }) {
   const [name, setName] = useState(defaultName || '');
@@ -13,19 +14,24 @@ export default function RsvpSection({ defaultName }) {
     e.preventDefault();
     if (!name.trim()) return;
 
+    const rsvpEntry = {
+      name: name.trim(),
+      attendance,
+      eventChoice,
+      guests,
+      time: new Date().toISOString()
+    };
+
     try {
       const existing = JSON.parse(localStorage.getItem('wedding_rsvp') || '[]');
-      existing.push({
-        name: name.trim(),
-        attendance,
-        eventChoice,
-        guests,
-        time: new Date().toISOString()
-      });
+      existing.push(rsvpEntry);
       localStorage.setItem('wedding_rsvp', JSON.stringify(existing));
     } catch (err) {
       console.error(err);
     }
+
+    // Save to Supabase Cloud asynchronously (no login needed)
+    insertRsvpToSupabase(rsvpEntry);
 
     setSubmitted(true);
   };

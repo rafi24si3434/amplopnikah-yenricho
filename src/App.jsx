@@ -42,6 +42,7 @@ export default function App() {
         if (!parsed.giftAddress || !parsed.giftAddress.postalCode || (parsed.giftAddress.street && parsed.giftAddress.street.includes('dusty pink'))) {
           parsed.giftAddress = defaultData.giftAddress;
         }
+        parsed.stories = defaultData.stories;
         initial = { ...defaultData, ...parsed };
       }
     } catch (e) {

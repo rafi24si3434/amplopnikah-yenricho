@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, MessageCircle, Send, Sparkles } from 'lucide-react';
 import { UlosRibbonDivider, GorgaBatakOrnament, CornerGorgaFiligree } from './Ornaments';
+import { supabase, fetchWishesFromSupabase, insertWishToSupabase } from '../utils/supabaseClient';
 
 export default function WishesSection({ defaultName }) {
   const [name, setName] = useState(defaultName || '');
@@ -16,6 +17,7 @@ export default function WishesSection({ defaultName }) {
   ];
 
   useEffect(() => {
+    // 1. Initial load from localStorage (instant UI)
     try {
       const saved = JSON.parse(localStorage.getItem('wedding_wishes') || '[]');
       if (saved.length > 0) {
@@ -23,11 +25,13 @@ export default function WishesSection({ defaultName }) {
       } else {
         const defaults = [
           {
+            id: 'default-1',
             name: 'Maria Simanjuntak',
             message: 'Selamat menempuh hidup baru Yenricho & Veni! Tuhan memberkati pernikahan dan keluarga kalian senantiasa. Horas! 🙏❤️',
             time: new Date(Date.now() - 3600000 * 3).toISOString()
           },
           {
+            id: 'default-2',
             name: 'Parulian Situmorang',
             message: 'Bahagia selalu Yenricho & Veni! Semoga menjadi keluarga yang rukun, penuh sukacita, dan diberkati Tuhan berlimpah-limpah. 💒✨',
             time: new Date(Date.now() - 3600000 * 8).toISOString()
@@ -39,19 +43,63 @@ export default function WishesSection({ defaultName }) {
     } catch (e) {
       console.error(e);
     }
+
+    // 2. Fetch from Supabase Cloud
+    let isMounted = true;
+    async function loadCloudWishes() {
+      const remote = await fetchWishesFromSupabase();
+      if (isMounted && remote && remote.length > 0) {
+        setWishes(remote);
+        try {
+          localStorage.setItem('wedding_wishes', JSON.stringify(remote));
+        } catch (e) {}
+      }
+    }
+    loadCloudWishes();
+
+    // 3. Realtime Listener from Supabase
+    const channel = supabase
+      .channel('public:wishes')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'wishes' }, (payload) => {
+        if (!payload.new) return;
+        const newEntry = {
+          id: payload.new.id,
+          name: payload.new.sender_name,
+          message: payload.new.message,
+          time: payload.new.created_at
+        };
+        setWishes((prev) => {
+          if (prev.some((w) => w.id === newEntry.id)) return prev;
+          const updated = [newEntry, ...prev];
+          try {
+            localStorage.setItem('wedding_wishes', JSON.stringify(updated));
+          } catch (e) {}
+          return updated;
+        });
+      })
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      supabase.removeChannel(channel);
+    };
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name.trim() || !message.trim()) return;
 
-    const newWish = {
-      name: name.trim(),
-      message: message.trim(),
+    const trimmedName = name.trim();
+    const trimmedMessage = message.trim();
+
+    const localEntry = {
+      id: Date.now().toString(),
+      name: trimmedName,
+      message: trimmedMessage,
       time: new Date().toISOString()
     };
 
-    const updated = [newWish, ...wishes];
+    const updated = [localEntry, ...wishes];
     setWishes(updated);
     try {
       localStorage.setItem('wedding_wishes', JSON.stringify(updated));
@@ -60,6 +108,9 @@ export default function WishesSection({ defaultName }) {
     }
 
     setMessage('');
+
+    // Save to Supabase Cloud asynchronously (no login needed)
+    insertWishToSupabase(trimmedName, trimmedMessage);
   };
 
   const getTimeAgo = (dateStr) => {

@@ -5,6 +5,7 @@ import {
   ExternalLink, ChevronDown, Sparkles, Navigation
 } from 'lucide-react';
 import { UlosRibbonDivider, GorgaBatakOrnament, CornerGorgaFiligree } from './Ornaments';
+import { fetchGiftConfirmationsFromSupabase, insertGiftConfirmationToSupabase } from '../utils/supabaseClient';
 
 export default function DigitalEnvelopeSection({ bankAccounts, giftAddress, defaultGuestName }) {
   const [copiedAccount, setCopiedAccount] = useState('');
@@ -32,12 +33,30 @@ export default function DigitalEnvelopeSection({ bankAccounts, giftAddress, defa
   }, [defaultGuestName]);
 
   useEffect(() => {
+    // 1. Initial load from local storage
     try {
       const saved = JSON.parse(localStorage.getItem('wedding_gift_confirmations') || '[]');
       setSavedConfirmations(saved);
     } catch (e) {
       console.error(e);
     }
+
+    // 2. Fetch from Supabase Cloud
+    let isMounted = true;
+    async function loadCloudGifts() {
+      const remote = await fetchGiftConfirmationsFromSupabase();
+      if (isMounted && remote && remote.length > 0) {
+        setSavedConfirmations(remote);
+        try {
+          localStorage.setItem('wedding_gift_confirmations', JSON.stringify(remote));
+        } catch (e) {}
+      }
+    }
+    loadCloudGifts();
+
+    return () => {
+      isMounted = false;
+    };
   }, [isSubmitted]);
 
   useEffect(() => {
@@ -81,7 +100,7 @@ Patokan: ${landmark}`;
     setTimeout(() => setCopiedAddress(false), 2500);
   };
 
-  const saveToLocalStorage = (newEntry) => {
+  const saveToLocalStorage = async (newEntry) => {
     try {
       const existing = JSON.parse(localStorage.getItem('wedding_gift_confirmations') || '[]');
       const updated = [newEntry, ...existing];
@@ -90,6 +109,21 @@ Patokan: ${landmark}`;
       window.dispatchEvent(new CustomEvent('gift-confirmation-updated', { detail: updated }));
     } catch (e) {
       console.error(e);
+    }
+
+    // Save to Supabase Cloud asynchronously (no login needed)
+    try {
+      const savedCloud = await insertGiftConfirmationToSupabase(newEntry);
+      if (savedCloud && savedCloud.id) {
+        // Update local entry with real Supabase UUID for synced deletion
+        const existing = JSON.parse(localStorage.getItem('wedding_gift_confirmations') || '[]');
+        const updatedWithUuid = existing.map(item => item.id === newEntry.id ? { ...item, id: savedCloud.id } : item);
+        localStorage.setItem('wedding_gift_confirmations', JSON.stringify(updatedWithUuid));
+        setSavedConfirmations(updatedWithUuid);
+        window.dispatchEvent(new CustomEvent('gift-confirmation-updated', { detail: updatedWithUuid }));
+      }
+    } catch (err) {
+      console.error('[Gift] Error saving to Supabase:', err);
     }
   };
 
@@ -157,7 +191,7 @@ Semoga kado diterima dengan selamat dan bermanfaat bagi kedua mempelai. Horas & 
       giftItem: giftItem.trim() || 'Tanda Kasih Pernikahan',
       giftMessage: giftMessage.trim(),
       timestamp: new Date().toISOString(),
-      channel: 'Website'
+      channel: 'Web'
     };
 
     saveToLocalStorage(entry);
