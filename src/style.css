@@ -1427,6 +1427,27 @@ button {
   box-shadow: 0 6px 20px rgba(201, 169, 110, 0.35);
 }
 
+.envelope-tab-pane {
+  display: block;
+  width: 100%;
+  animation: envelopeTabFade 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.envelope-tab-pane.hidden {
+  display: none !important;
+}
+
+@keyframes envelopeTabFade {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .bank-cards-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -1643,80 +1664,597 @@ button {
   border-color: #22c55e;
 }
 
-.gift-address-container {
-  max-width: 650px;
-  margin: 0 auto;
+/* ========================================================
+   GIFT ADDRESS & CONFIRMATION LOGIC (BRIGHT LUXURY THEME)
+   ======================================================== */
+.gift-cta-banner {
+  max-width: 880px;
+  margin: 1.5rem auto 0;
+  padding: 1.2rem 1.6rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(254, 243, 199, 0.85) 100%);
+  border: 1.5px solid rgba(184, 139, 74, 0.45);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  box-shadow: 0 8px 24px rgba(184, 139, 74, 0.12);
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
-.gift-address-card {
-  text-align: center;
-  padding: 2.5rem 2rem;
+
+.gift-cta-banner:hover {
+  transform: translateY(-3px);
+  border-color: var(--gold);
+  box-shadow: 0 12px 30px rgba(184, 139, 74, 0.22);
 }
-.gift-card-icon {
-  color: var(--gold);
-  margin-bottom: 1rem;
+
+.gift-cta-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(184, 139, 74, 0.3);
 }
-.gift-title {
-  font-family: var(--font-serif);
-  font-size: 1.4rem;
-  color: var(--gold);
-  margin-bottom: 1.5rem;
-}
-.gift-info-list {
+
+.gift-cta-text {
+  flex: 1;
   text-align: left;
-  margin-bottom: 2rem;
+}
+
+.gift-cta-title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  color: var(--batak-dark);
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.gift-cta-sub {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.gift-cta-btn {
+  padding: 0.65rem 1.3rem !important;
+  font-size: 0.82rem !important;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .gift-cta-banner {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1.2rem;
+  }
+  .gift-cta-text {
+    text-align: center;
+  }
+  .gift-cta-btn {
+    width: 100%;
+  }
+}
+
+.gift-feature-container {
+  max-width: 780px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
+  gap: 2rem;
+}
+
+.gift-address-card {
+  position: relative;
+  text-align: left;
+  padding: 2.8rem 2.2rem 2.2rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(184, 139, 74, 0.45);
+  box-shadow: 0 16px 40px rgba(138, 99, 36, 0.1);
+}
+
+.gift-badge-royal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.38rem 1rem;
+  border-radius: 20px;
+  background: rgba(184, 139, 74, 0.12);
+  border: 1px solid rgba(184, 139, 74, 0.35);
+  color: var(--gold-dark);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-bottom: 1.2rem;
+}
+
+.gift-card-main-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.4rem, 3.5vw, 1.8rem);
+  color: var(--batak-dark);
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.gift-card-subtitle {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 1.8rem;
+}
+
+.gift-details-box {
+  background: rgba(247, 242, 234, 0.75);
+  border-radius: 14px;
+  border: 1px solid rgba(184, 139, 74, 0.28);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+  margin-bottom: 1.8rem;
+}
+
+.gift-detail-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.gift-detail-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(201, 169, 110, 0.22), rgba(158, 31, 31, 0.08));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-dark);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.gift-detail-content {
+  flex: 1;
+}
+
+.gift-detail-label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--gold-dark);
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.gift-detail-value {
+  display: block;
+  font-size: 1.02rem;
+  color: var(--batak-dark);
+  line-height: 1.5;
+}
+
+.gift-detail-value.main-address {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #1f1d1a;
+}
+
+.gift-detail-value.phone-number {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  font-size: 1.15rem;
+  color: #15803d;
+}
+
+.gift-detail-sub {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.gift-tag-badges {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.gift-tag-badge {
+  font-size: 0.76rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid rgba(184, 139, 74, 0.3);
+  color: var(--text-dark);
+}
+
+.gift-tag-badge.postal {
+  border-color: #3b82f6;
+  color: #1d4ed8;
+  background: #eff6ff;
+  font-weight: 600;
+}
+
+.gift-tag-badge.landmark {
+  border-color: #f59e0b;
+  color: #b45309;
+  background: #fffbeb;
+  font-weight: 600;
+}
+
+.gift-address-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-royal-gift {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.85rem 1.6rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+}
+
+.btn-royal-gift.btn-copy {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 15px rgba(184, 139, 74, 0.35);
+}
+
+.btn-royal-gift.btn-copy:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(184, 139, 74, 0.45);
+}
+
+.btn-royal-gift.btn-copy.copied {
+  background: #16a34a;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(22, 163, 74, 0.35);
+}
+
+.btn-royal-gift.btn-map {
+  background: #fff;
+  color: var(--batak-dark);
+  border: 1.5px solid rgba(184, 139, 74, 0.5);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+}
+
+.btn-royal-gift.btn-map:hover {
+  background: rgba(201, 169, 110, 0.15);
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+/* ========================================================
+   GIFT CONFIRMATION FORM & STATUS STYLING
+   ======================================================== */
+.gift-confirmation-card {
+  position: relative;
+  text-align: left;
+  padding: 2.8rem 2.2rem 2.2rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(184, 139, 74, 0.45);
+  box-shadow: 0 16px 40px rgba(138, 99, 36, 0.1);
+}
+
+.gift-confirm-header {
+  display: flex;
+  gap: 1.2rem;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.gift-confirm-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fef3c7, #fed7aa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b45309;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(180, 83, 9, 0.15);
+}
+
+.gift-confirm-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.3rem, 3vw, 1.6rem);
+  color: var(--batak-dark);
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.gift-confirm-desc {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.gift-confirm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
 }
-.gift-info-item {
+
+@media (max-width: 640px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group-gift {
   display: flex;
-  gap: 0.8rem;
-  align-items: flex-start;
-  color: var(--text-light);
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.6rem;
 }
-.gift-pin-icon {
-  color: var(--gold);
-  flex-shrink: 0;
-  margin-top: 3px;
+
+.form-group-gift label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--batak-dark);
 }
-.gift-buttons-row {
+
+.form-group-gift .req {
+  color: #dc2626;
+}
+
+.gift-input {
+  width: 100%;
+  padding: 0.8rem 1.1rem;
+  border-radius: 12px;
+  border: 1.5px solid rgba(184, 139, 74, 0.35);
+  background: rgba(255, 255, 255, 0.95);
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  transition: all 0.25s;
+}
+
+.gift-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.22);
+  background: #fff;
+}
+
+.gift-select {
+  cursor: pointer;
+  appearance: auto;
+}
+
+.gift-textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+.gift-form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.btn-royal-gift.btn-wa-submit {
+  background: #25d366;
+  color: #fff;
+  border: none;
+  flex: 1.2;
+  min-width: 220px;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.35);
+}
+
+.btn-royal-gift.btn-wa-submit:hover {
+  background: #1ebd5a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.45);
+}
+
+.btn-royal-gift.btn-web-submit {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: #fff;
+  border: none;
+  flex: 1;
+  min-width: 180px;
+  box-shadow: 0 4px 15px rgba(184, 139, 74, 0.35);
+}
+
+.btn-royal-gift.btn-web-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(184, 139, 74, 0.45);
+}
+
+.gift-privacy-hint {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  margin-top: 0.8rem;
+  text-align: center;
+}
+
+/* Success View */
+.gift-success-view {
+  text-align: center;
+  padding: 1.5rem 0.5rem;
+}
+
+.gift-success-icon-bubble {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 1.2rem;
+  border-radius: 50%;
+  background: #dcfce7;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(22, 163, 74, 0.2);
+}
+
+.gift-success-title {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  color: var(--batak-dark);
+  margin-bottom: 0.5rem;
+}
+
+.gift-success-desc {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  max-width: 520px;
+  margin: 0 auto 1.5rem;
+}
+
+.gift-success-summary-box {
+  background: rgba(247, 242, 234, 0.85);
+  border-radius: 12px;
+  border: 1px solid rgba(184, 139, 74, 0.3);
+  padding: 1.2rem 1.5rem;
+  max-width: 520px;
+  margin: 0 auto 1.8rem;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  color: var(--text-dark);
+}
+
+.summary-row code {
+  font-family: monospace;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 700;
+  color: #1e40af;
+}
+
+.summary-quote {
+  font-style: italic;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  padding-top: 0.4rem;
+  border-top: 1px dashed rgba(184, 139, 74, 0.3);
+}
+
+.gift-success-actions {
   display: flex;
   gap: 1rem;
   justify-content: center;
   flex-wrap: wrap;
 }
-.btn-copy-address {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.8rem 1.6rem;
-  border-radius: 50px;
-  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
-  color: var(--dark);
-  font-weight: 600;
-  font-size: 0.88rem;
-  transition: all 0.3s;
+
+.btn-royal-gift.btn-secondary-outline {
+  background: #fff;
+  color: var(--batak-dark);
+  border: 1.5px solid rgba(184, 139, 74, 0.5);
 }
-.btn-copy-address.copied {
-  background: var(--sage);
-  color: #fff;
-}
-.btn-wa-confirm {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.8rem 1.6rem;
-  border-radius: 50px;
-  border: 1.5px solid #25d366;
-  color: #25d366;
-  font-weight: 600;
-  font-size: 0.88rem;
-  transition: all 0.3s;
-}
-.btn-wa-confirm:hover {
+
+.btn-royal-gift.btn-wa {
   background: #25d366;
   color: #fff;
+  border: none;
 }
+
+/* History Drawer */
+.gift-history-drawer {
+  margin-top: 2rem;
+  border-top: 1px solid rgba(184, 139, 74, 0.25);
+  padding-top: 1.4rem;
+}
+
+.gift-history-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  margin-bottom: 1rem;
+}
+
+.gift-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.gift-history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.1rem;
+  background: rgba(247, 242, 234, 0.65);
+  border: 1px solid rgba(184, 139, 74, 0.22);
+  border-radius: 10px;
+}
+
+.gift-history-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.gift-history-main strong {
+  font-size: 0.9rem;
+  color: var(--batak-dark);
+}
+
+.gift-history-meta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.gift-history-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 12px;
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
 .envelope-thanks-note {
   margin-top: 3rem;
   text-align: center;
@@ -5857,321 +6395,137 @@ textarea {
 }
 
 /* ========================================================
-   BATAK BLESSING WIDGET (BORAS SIPIR NI TONDI & UMPASA)
+   ADMIN INCOMING GIFTS MANAGER STYLING
    ======================================================== */
-.batak-blessing-section {
-  position: relative;
-  padding: 5rem 1.5rem;
-  background-position: center 25% !important;
+.incoming-gifts-section {
+  margin-top: 1.5rem;
 }
 
-.blessing-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2.2rem;
-  margin-top: 2rem;
+.empty-gift-notice {
+  padding: 1.5rem;
+  text-align: center;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px dashed rgba(184, 139, 74, 0.3);
+  color: var(--text-muted);
+  font-size: 0.88rem;
 }
 
-.blessing-card {
-  position: relative;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1.5px solid rgba(184, 139, 74, 0.45);
-  border-radius: 22px;
-  padding: 2.4rem 2rem;
-  box-shadow: 0 18px 45px rgba(138, 99, 36, 0.12);
+.incoming-gifts-grid {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  gap: 0.85rem;
 }
 
-.blessing-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 22px 50px rgba(184, 139, 74, 0.22);
-}
-
-/* Boras Sipir Ni Tondi Card */
-.boras-card-header {
-  text-align: center;
-}
-
-.boras-badge {
-  display: inline-block;
-  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
-  color: #FFFFFF;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 2px;
-  padding: 3px 12px;
-  border-radius: 20px;
-  text-transform: uppercase;
-  margin-bottom: 0.75rem;
-}
-
-.boras-card-title {
-  font-family: var(--font-serif);
-  font-size: 1.5rem;
-  color: var(--batak-dark);
-  font-weight: 700;
-  margin-bottom: 0.6rem;
-}
-
-.boras-card-desc {
-  font-size: 0.88rem;
-  color: #4A453E;
-  line-height: 1.6;
-}
-
-.boras-interactive-bowl {
-  margin: 1.8rem auto 1.4rem;
-  text-align: center;
-}
-
-.boras-grain-cluster {
-  font-size: 2.2rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.blessing-counter-text {
-  font-size: 0.95rem;
-  color: var(--text-dark);
-  margin-top: 0.6rem;
-}
-
-.blessing-counter-text strong {
-  color: var(--gold-dark);
-  font-size: 1.3rem;
-  font-family: var(--font-serif);
-}
-
-.btn-tabur-boras {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  width: 100%;
-  padding: 1.05rem 1.8rem;
-  background: linear-gradient(135deg, #B88B4A, #D4AF37);
-  color: #1A1816;
-  border-radius: 50px;
-  font-weight: 700;
-  font-size: 0.92rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  box-shadow: 0 8px 25px rgba(184, 139, 74, 0.4);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.btn-tabur-boras:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(184, 139, 74, 0.55);
-  background: linear-gradient(135deg, #D4AF37, #ECC880);
-}
-
-.btn-tabur-boras:active {
-  transform: scale(0.97);
-}
-
-.boras-hint {
-  font-size: 0.76rem;
-  color: var(--text-muted);
-  text-align: center;
-  margin-top: 0.7rem;
-}
-
-/* Boras Toast Notification */
-.boras-toast-banner {
-  margin-top: 1.2rem;
+.incoming-gift-card {
   padding: 1rem 1.2rem;
-  background: #FFFDF9;
-  border: 1.5px solid var(--gold);
-  border-radius: 14px;
-  text-align: center;
-  box-shadow: 0 6px 20px rgba(184, 139, 74, 0.25);
-  animation: fadeInUp 0.4s ease-out;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid rgba(184, 139, 74, 0.28);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
-.toast-crest {
-  font-size: 0.72rem;
-  font-weight: 800;
-  color: var(--batak-red);
-  letter-spacing: 2px;
-  margin-bottom: 0.3rem;
+.incoming-gift-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.toast-toba {
-  font-family: var(--font-serif);
-  font-style: italic;
+.incoming-sender-name {
   font-size: 0.95rem;
   color: var(--batak-dark);
-  font-weight: 600;
-  line-height: 1.5;
 }
 
-.toast-id {
+.incoming-sender-phone {
   font-size: 0.8rem;
-  color: #6B655D;
-  margin-top: 0.25rem;
+  color: #15803d;
+  font-family: monospace;
 }
 
-/* Umpasa Card */
-.umpasa-card-header {
-  margin-bottom: 1.2rem;
-}
-
-.umpasa-theme-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.6rem;
-}
-
-.umpasa-theme-badge {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--batak-red);
-  background: rgba(185, 28, 28, 0.08);
-  padding: 3px 10px;
-  border-radius: 12px;
-}
-
-.umpasa-step-pill {
+.gift-channel-tag {
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--gold-dark);
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
   background: rgba(184, 139, 74, 0.12);
-  padding: 2px 8px;
-  border-radius: 10px;
+  color: var(--gold-dark);
+  border: 1px solid rgba(184, 139, 74, 0.25);
 }
 
-.umpasa-card-title {
-  font-family: var(--font-serif);
-  font-size: 1.45rem;
-  color: var(--batak-dark);
-  font-weight: 700;
+.incoming-gift-body {
+  font-size: 0.86rem;
+  color: var(--text-dark);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
-.umpasa-card-body {
-  position: relative;
-  background: rgba(246, 240, 230, 0.6);
-  border: 1px solid rgba(184, 139, 74, 0.3);
-  border-radius: 16px;
-  padding: 1.6rem 1.5rem;
-  margin-bottom: 1.4rem;
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.umpasa-card-body.flipping {
-  opacity: 0.2;
-  transform: rotateX(20deg) scale(0.98);
-}
-
-.umpasa-quote-icon {
-  font-family: Georgia, serif;
-  font-size: 2.4rem;
-  line-height: 1;
-  color: var(--gold);
-  opacity: 0.6;
-  margin-bottom: -0.5rem;
-}
-
-.umpasa-toba-text {
-  font-family: var(--font-serif);
-  font-size: 1.12rem;
+.incoming-gift-msg {
   font-style: italic;
-  font-weight: 700;
-  color: var(--batak-dark);
-  line-height: 1.6;
-  margin-bottom: 0.8rem;
-}
-
-.umpasa-divider-line {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(184, 139, 74, 0.4), transparent);
-  margin: 0.8rem 0;
-}
-
-.umpasa-arti-text {
-  font-size: 0.88rem;
-  color: #3D3934;
-  line-height: 1.6;
-  margin-bottom: 0.5rem;
-}
-
-.umpasa-makna-text {
+  color: var(--text-muted);
   font-size: 0.82rem;
-  color: #6B655D;
-  line-height: 1.5;
-  font-style: italic;
+  background: rgba(247, 242, 234, 0.6);
+  padding: 0.4rem 0.7rem;
+  border-radius: 6px;
+  border-left: 2px solid var(--gold);
 }
 
-.umpasa-action-row {
+.incoming-date {
+  font-size: 0.74rem;
+  color: #9ca3af;
+  margin-top: 0.2rem;
+}
+
+.incoming-gift-actions {
   display: flex;
   gap: 0.6rem;
-  flex-wrap: wrap;
   align-items: center;
+  margin-top: 0.2rem;
+  padding-top: 0.6rem;
+  border-top: 1px dashed rgba(0, 0, 0, 0.08);
 }
 
-.btn-umpasa-next,
-.btn-umpasa-copy,
-.btn-umpasa-use {
+.btn-adm-mini {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  font-size: 0.8rem;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
   font-weight: 600;
-  border-radius: 50px;
-  padding: 0.65rem 1.1rem;
-  transition: all 0.25s ease;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
-.btn-umpasa-next {
-  background: rgba(184, 139, 74, 0.12);
-  color: var(--gold-dark);
-  border: 1px solid rgba(184, 139, 74, 0.35);
+.btn-adm-mini:hover {
+  background: #e5e7eb;
 }
 
-.btn-umpasa-next:hover {
-  background: rgba(184, 139, 74, 0.22);
-  transform: translateY(-2px);
+.btn-adm-mini.btn-wa-mini {
+  background: #dcfce7;
+  color: #15803d;
+  border-color: #86efac;
 }
 
-.btn-umpasa-copy {
-  background: #FFFFFF;
-  color: #2D2926;
-  border: 1px solid rgba(184, 139, 74, 0.35);
+.btn-adm-mini.btn-wa-mini:hover {
+  background: #bbf7d0;
 }
 
-.btn-umpasa-copy.copied {
-  background: #10B981;
-  color: #FFFFFF;
-  border-color: #10B981;
+.btn-adm-mini.danger {
+  color: #dc2626;
+  border-color: #fca5a5;
+  background: #fef2f2;
+  margin-left: auto;
 }
 
-.btn-umpasa-use {
-  flex: 1;
-  min-width: 140px;
-  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
-  color: #FFFFFF;
-  border: none;
-  box-shadow: 0 4px 15px rgba(138, 99, 36, 0.25);
-}
-
-.btn-umpasa-use:hover {
-  background: linear-gradient(135deg, var(--gold), var(--gold-light));
-  color: #1A1816;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(184, 139, 74, 0.35);
+.btn-adm-mini.danger:hover {
+  background: #fee2e2;
 }
 
 /* ========================================================

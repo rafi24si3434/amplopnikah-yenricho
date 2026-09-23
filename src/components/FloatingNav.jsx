@@ -9,7 +9,7 @@ export default function FloatingNav() {
     { id: 'story', label: 'Kisah Cinta' },
     { id: 'event', label: 'Acara & Lokasi' },
     { id: 'gallery', label: 'Galeri' },
-    { id: 'envelope-section', label: 'Amplop Digital' },
+    { id: 'envelope-section', label: 'Amplop & Kado' },
     { id: 'rsvp', label: 'RSVP' },
     { id: 'wishes', label: 'Ucapan' }
   ];

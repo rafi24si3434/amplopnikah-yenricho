@@ -3,7 +3,7 @@ import {
   Users, Edit3, Share2, CreditCard, Printer, Download, ExternalLink, 
   RotateCcw, Sparkles, Plus, Trash2, Check, Copy, MessageCircle, 
   QrCode, FileSpreadsheet, CheckCircle2, Clock, Search, ArrowLeft, 
-  Gift, Building2, Heart, Send, X, Eye, FileText
+  Gift, Building2, Heart, Send, X, Eye, FileText, Package, Truck
 } from 'lucide-react';
 import { MonogramCrest } from './Ornaments';
 
@@ -43,6 +43,25 @@ export default function AdminPage({
     } catch (e) {}
     return {};
   });
+
+  // Incoming gift confirmations tracker
+  const [giftConfirmations, setGiftConfirmations] = useState(() => {
+    try {
+      const saved = localStorage.getItem('wedding_gift_confirmations');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return [];
+  });
+
+  useEffect(() => {
+    const handleGiftUpdate = (e) => {
+      if (e.detail) {
+        setGiftConfirmations(e.detail);
+      }
+    };
+    window.addEventListener('gift-confirmation-updated', handleGiftUpdate);
+    return () => window.removeEventListener('gift-confirmation-updated', handleGiftUpdate);
+  }, []);
 
   const totalSentCount = bulkList.filter(guest => !!sentStatus[guest]).length;
   const totalUnsentCount = bulkList.length - totalSentCount;
@@ -299,6 +318,16 @@ export default function AdminPage({
               <span className="stat-label">Rekening Bank Aktif</span>
             </div>
           </div>
+
+          <div className="stat-card cursor-pointer" onClick={() => setActiveTab('gifts')} title="Klik untuk membuka kelola kado masuk" style={{ cursor: 'pointer' }}>
+            <div className="stat-icon-circle" style={{ background: '#fef3c7', color: '#b45309' }}>
+              <Package size={22} />
+            </div>
+            <div>
+              <span className="stat-number">{giftConfirmations.length}</span>
+              <span className="stat-label">Kado Dikonfirmasi</span>
+            </div>
+          </div>
         </div>
 
         {/* Tab Navigation Menu */}
@@ -332,7 +361,15 @@ export default function AdminPage({
             onClick={() => setActiveTab('bank')}
           >
             <CreditCard size={16} />
-            <span>Rekening & Kado Fisik</span>
+            <span>Rekening & Alamat</span>
+          </button>
+
+          <button 
+            className={`admin-nav-tab ${activeTab === 'gifts' ? 'active' : ''}`}
+            onClick={() => setActiveTab('gifts')}
+          >
+            <Package size={16} />
+            <span>Kado Masuk ({giftConfirmations.length})</span>
           </button>
 
           <button 
@@ -787,26 +824,249 @@ export default function AdminPage({
 
               <hr className="admin-divider" />
 
-              <h4 className="sub-section-title">Alamat Pengiriman Kado Fisik</h4>
+              <h4 className="sub-section-title">
+                <Gift size={16} className="gold-text" />
+                Alamat Resmi Pengiriman Kado Fisik
+              </h4>
               <div className="gift-address-form">
                 <div className="form-group">
-                  <label className="admin-label">Alamat Lengkap Dumai:</label>
+                  <label className="admin-label">Alamat Lengkap Pengiriman:</label>
                   <textarea 
-                    rows={3}
-                    value={data.giftAddress ? `${data.giftAddress.recipient} - ${data.giftAddress.phone}\n${data.giftAddress.address}` : ''}
+                    rows={4}
+                    value={data.giftAddress ? `Penerima: ${data.giftAddress.recipient} (${data.giftAddress.phone})\nAlamat: ${data.giftAddress.street}\nWilayah: ${data.giftAddress.subdistrict}\nKode Pos / ID: ${data.giftAddress.postalCode || '28811'}\nPatokan: ${data.giftAddress.landmark || 'Rumah pagar steinless putih'}` : ''}
                     readOnly
                     className="admin-textarea"
                   />
                   <span className="input-hint">
-                    Penerima: Veni Gracia Sitanggang (0821-7299-8806) / Yenricho Silaban (0822-8356-9169) - Dumai, Riau.
+                    Alamat ini yang muncul pada tab 'Kirim Kado & Konfirmasi' di website undangan tamu.
                   </span>
                 </div>
+              </div>
+
+              <hr className="admin-divider" />
+
+              {/* DAFTAR KONFIRMASI KADO MASUK DARI TAMU */}
+              <div className="incoming-gifts-section">
+                <div className="flex justify-between items-center mb-3">
+                  <div>
+                    <h4 className="sub-section-title mb-1">
+                      <Package size={16} className="gold-text" />
+                      Daftar Konfirmasi Kado Masuk ({giftConfirmations.length})
+                    </h4>
+                    <p className="card-desc text-xs">
+                      Konfirmasi yang dikirimkan oleh tamu undangan via formulir kado di website.
+                    </p>
+                  </div>
+                </div>
+
+                {giftConfirmations.length === 0 ? (
+                  <div className="empty-gift-notice">
+                    <p>Belum ada konfirmasi pengiriman kado yang masuk dari tamu.</p>
+                  </div>
+                ) : (
+                  <div className="incoming-gifts-grid">
+                    {giftConfirmations.map((g) => (
+                      <div key={g.id} className="incoming-gift-card">
+                        <div className="incoming-gift-top">
+                          <div>
+                            <strong className="incoming-sender-name">{g.senderName}</strong>
+                            {g.senderPhone && (
+                              <span className="incoming-sender-phone"> • {g.senderPhone}</span>
+                            )}
+                          </div>
+                          <span className="gift-channel-tag">{g.channel || 'Website'}</span>
+                        </div>
+
+                        <div className="incoming-gift-body">
+                          <p className="incoming-gift-item">
+                            🎁 <strong>Kado:</strong> {g.giftItem || 'Tanda Kasih'}
+                          </p>
+                          <p className="incoming-courier">
+                            🚚 <strong>Kurir:</strong> {g.courier} {g.trackingNumber ? `(Resi: ${g.trackingNumber})` : ''}
+                          </p>
+                          {g.giftMessage && (
+                            <p className="incoming-gift-msg">
+                              💌 "{g.giftMessage}"
+                            </p>
+                          )}
+                          <span className="incoming-date">
+                            {new Date(g.timestamp).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
+                          </span>
+                        </div>
+
+                        <div className="incoming-gift-actions">
+                          {g.trackingNumber && (
+                            <button 
+                              className="btn-adm-mini"
+                              onClick={() => {
+                                navigator.clipboard.writeText(g.trackingNumber);
+                                triggerToast('Nomor resi berhasil disalin!');
+                              }}
+                            >
+                              <Copy size={13} />
+                              <span>Salin Resi</span>
+                            </button>
+                          )}
+                          {g.senderPhone && (
+                            <a 
+                              href={`https://wa.me/62${g.senderPhone.replace(/^0/, '').replace(/\D/g, '')}?text=Halo%20${encodeURIComponent(g.senderName)},%20terima%20kasih%20banyak%20atas%20kado%20pernikahan%20yang%20telah%20dikirimkan...`}
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="btn-adm-mini btn-wa-mini"
+                            >
+                              <MessageCircle size={13} />
+                              <span>WA Pengirim</span>
+                            </a>
+                          )}
+                          <button 
+                            className="btn-adm-mini danger"
+                            onClick={() => {
+                              if (window.confirm(`Hapus catatan konfirmasi kado dari ${g.senderName}?`)) {
+                                const filtered = giftConfirmations.filter(item => item.id !== g.id);
+                                setGiftConfirmations(filtered);
+                                localStorage.setItem('wedding_gift_confirmations', JSON.stringify(filtered));
+                                triggerToast('Catatan kado dihapus');
+                              }
+                            }}
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
         )}
 
-        {/* TAB 5: CETAK AMPLOP & PDF */}
+        {/* TAB 5: KADO MASUK DARI TAMU */}
+        {activeTab === 'gifts' && (
+          <div className="admin-tab-pane">
+            <div className="admin-card max-w-900">
+              <div className="flex justify-between items-center mb-3">
+                <div>
+                  <h3 className="card-section-title">
+                    <Package size={20} className="gold-text" />
+                    Daftar Kado Masuk Dikonfirmasi ({giftConfirmations.length})
+                  </h3>
+                  <p className="card-desc">
+                    Seluruh konfirmasi pengiriman kado pernikahan yang diisi oleh para tamu melalui formulir di website.
+                  </p>
+                </div>
+
+                {giftConfirmations.length > 0 && (
+                  <button 
+                    className="btn-adm-secondary"
+                    onClick={() => {
+                      const textData = giftConfirmations.map((g, i) => 
+                        `${i + 1}. ${g.senderName} (${g.senderPhone || '-'}) | Kado: ${g.giftItem || '-'} | Kurir: ${g.courier} | Resi: ${g.trackingNumber || '-'} | Pesan: "${g.giftMessage || '-'}"`
+                      ).join('\n\n');
+                      navigator.clipboard.writeText(textData);
+                      triggerToast('Daftar kado berhasil disalin ke clipboard!');
+                    }}
+                  >
+                    <Copy size={15} />
+                    <span>Salin Semua Data Kado</span>
+                  </button>
+                )}
+              </div>
+
+              {giftConfirmations.length === 0 ? (
+                <div className="empty-gift-notice" style={{ padding: '3rem 1.5rem', textAlign: 'center' }}>
+                  <Package size={48} style={{ color: '#d4af37', margin: '0 auto 1rem', display: 'block' }} />
+                  <h4 style={{ fontSize: '1.15rem', marginBottom: '0.5rem', color: 'var(--batak-dark)' }}>Belum Ada Kado yang Dikonfirmasi</h4>
+                  <p style={{ maxWidth: '460px', margin: '0 auto', fontSize: '0.88rem', color: 'var(--text-muted)' }}>
+                    Ketika tamu undangan mengisi formulir di bagian <strong>"Kirim Kado & Konfirmasi"</strong> pada website undangan, data kado beserta nomor resi kurir akan otomatis muncul di halaman ini.
+                  </p>
+                </div>
+              ) : (
+                <div className="incoming-gifts-grid">
+                  {giftConfirmations.map((g, index) => (
+                    <div key={g.id || index} className="incoming-gift-card">
+                      <div className="incoming-gift-top">
+                        <div>
+                          <strong className="incoming-sender-name" style={{ fontSize: '1.05rem' }}>
+                            {g.senderName}
+                          </strong>
+                          {g.senderPhone && (
+                            <span className="incoming-sender-phone"> • {g.senderPhone}</span>
+                          )}
+                        </div>
+                        <span className="gift-channel-tag">{g.channel || 'Website'}</span>
+                      </div>
+
+                      <div className="incoming-gift-body">
+                        <p className="incoming-gift-item" style={{ fontSize: '0.92rem' }}>
+                          🎁 <strong>Kado:</strong> {g.giftItem || 'Tanda Kasih Pernikahan'}
+                        </p>
+                        <p className="incoming-courier">
+                          🚚 <strong>Ekspedisi / Kurir:</strong> {g.courier} 
+                          {g.trackingNumber ? (
+                            <span style={{ marginLeft: '0.5rem' }}>
+                              (No. Resi: <code style={{ background: '#eff6ff', color: '#1d4ed8', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>{g.trackingNumber}</code>)
+                            </span>
+                          ) : ' (Tanpa nomor resi / Antar langsung)'}
+                        </p>
+                        {g.giftMessage && (
+                          <p className="incoming-gift-msg">
+                            💌 "{g.giftMessage}"
+                          </p>
+                        )}
+                        <span className="incoming-date">
+                          Waktu Konfirmasi: {new Date(g.timestamp).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' })}
+                        </span>
+                      </div>
+
+                      <div className="incoming-gift-actions">
+                        {g.trackingNumber && (
+                          <button 
+                            className="btn-adm-mini"
+                            onClick={() => {
+                              navigator.clipboard.writeText(g.trackingNumber);
+                              triggerToast('Nomor resi berhasil disalin!');
+                            }}
+                          >
+                            <Copy size={13} />
+                            <span>Salin Resi</span>
+                          </button>
+                        )}
+                        {g.senderPhone && (
+                          <a 
+                            href={`https://wa.me/62${g.senderPhone.replace(/^0/, '').replace(/\D/g, '')}?text=Halo%20${encodeURIComponent(g.senderName)},%20kami%20Yenricho%20%26%20Veni%20mengucapkan%20terima%20kasih%20banyak%20atas%20perhatian%20dan%20kado%20pernikahan%20yang%20telah%20dikirimkan...`}
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="btn-adm-mini btn-wa-mini"
+                          >
+                            <MessageCircle size={13} />
+                            <span>Balas WA Tamu</span>
+                          </a>
+                        )}
+                        <button 
+                          className="btn-adm-mini danger"
+                          onClick={() => {
+                            if (window.confirm(`Hapus catatan konfirmasi kado dari ${g.senderName}?`)) {
+                              const filtered = giftConfirmations.filter(item => item.id !== g.id);
+                              setGiftConfirmations(filtered);
+                              localStorage.setItem('wedding_gift_confirmations', JSON.stringify(filtered));
+                              triggerToast('Catatan kado dihapus');
+                            }
+                          }}
+                        >
+                          <Trash2 size={13} />
+                          <span>Hapus</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 6: CETAK AMPLOP & PDF */}
         {activeTab === 'print' && (
           <div className="admin-tab-pane">
             <div className="admin-card max-w-800">

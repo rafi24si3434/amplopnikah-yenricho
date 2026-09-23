@@ -38,6 +38,9 @@ export default function App() {
         if (!parsed.brideChildOrder) {
           parsed.brideChildOrder = defaultData.brideChildOrder;
         }
+        if (!parsed.giftAddress || !parsed.giftAddress.postalCode || (parsed.giftAddress.street && parsed.giftAddress.street.includes('dusty pink'))) {
+          parsed.giftAddress = defaultData.giftAddress;
+        }
         initial = { ...defaultData, ...parsed };
       }
     } catch (e) {
@@ -351,6 +354,7 @@ export default function App() {
         <DigitalEnvelopeSection 
           bankAccounts={data.bankAccounts} 
           giftAddress={data.giftAddress} 
+          defaultGuestName={data.recipientName}
         />
         <RsvpSection defaultName={data.recipientName} />
         <WishesSection defaultName={data.recipientName} />

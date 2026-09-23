@@ -76,8 +76,10 @@ export const defaultData = {
   giftAddress: {
     recipient: 'Yenricho & Veni',
     phone: '085363578319',
-    street: 'Jl. Pangeran Diponegoro, gang sentul. depan tiang listrik, rumah warna dusty pink, pagar steinles putih.',
-    subdistrict: 'Rimba sekampung, Dumai Kota, Kota Dumai.'
+    street: 'Jl. Diponegoro gang sentul ujung, (rumah pagar steinless putih)',
+    subdistrict: 'Kelurahan Rimba Sekampung, Kecamatan Dumai Kota, Kota Dumai, Riau',
+    postalCode: '28811',
+    landmark: 'Rumah pagar steinless putih'
   },
 
   // Love Story
