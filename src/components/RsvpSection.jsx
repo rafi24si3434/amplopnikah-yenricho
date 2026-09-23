@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, CheckCircle, XCircle, HelpCircle, Users, Send, HeartHandshake, Church, PartyPopper } from 'lucide-react';
 import { UlosRibbonDivider, GorgaBatakOrnament, CornerGorgaFiligree } from './Ornaments';
 import { insertRsvpToSupabase } from '../utils/supabaseClient';
@@ -9,6 +9,12 @@ export default function RsvpSection({ defaultName }) {
   const [eventChoice, setEventChoice] = useState('keduanya'); // 'pemberkatan', 'resepsi', 'keduanya'
   const [guests, setGuests] = useState('2');
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (defaultName && (!name || name === 'Bapak/Ibu/Saudara/i')) {
+      setName(defaultName);
+    }
+  }, [defaultName]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

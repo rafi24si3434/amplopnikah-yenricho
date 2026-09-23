@@ -25,6 +25,30 @@ import {
   fetchBulkListFromSupabase 
 } from './utils/supabaseClient';
 
+// Comprehensive guest parameter extractor from URL query or hash
+export function getGuestFromUrl() {
+  if (typeof window === 'undefined') return '';
+  try {
+    let params = new URLSearchParams(window.location.search);
+    let val = params.get('to') || params.get('kepada') || params.get('nama') || params.get('guest') || params.get('name');
+    
+    // Hash search fallback
+    if (!val && window.location.hash) {
+      const hash = window.location.hash;
+      const qIdx = hash.indexOf('?');
+      if (qIdx !== -1) {
+        params = new URLSearchParams(hash.slice(qIdx));
+        val = params.get('to') || params.get('kepada') || params.get('nama') || params.get('guest') || params.get('name');
+      }
+    }
+
+    if (val && val.trim()) {
+      return decodeURIComponent(val.trim().replace(/\+/g, ' '));
+    }
+  } catch (e) {}
+  return '';
+}
+
 export default function App() {
   // Load data from localStorage or defaultData, prioritizing URL params if present
   const [data, setData] = useState(() => {
@@ -55,14 +79,9 @@ export default function App() {
       console.error(e);
     }
 
-    if (typeof window !== 'undefined') {
-      try {
-        const params = new URLSearchParams(window.location.search);
-        const guestFromUrl = params.get('to') || params.get('kepada');
-        if (guestFromUrl) {
-          initial = { ...initial, recipientName: guestFromUrl };
-        }
-      } catch (e) {}
+    const guestFromUrl = getGuestFromUrl();
+    if (guestFromUrl) {
+      initial = { ...initial, recipientName: guestFromUrl };
     }
 
     return initial;
@@ -162,13 +181,21 @@ export default function App() {
     } catch (e) {}
   }, [bulkList]);
 
-  // Check URL params (?to=... or ?kepada=...) on initial mount
+  // Check URL params (?to=... or ?kepada=...) on initial mount and location changes
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const guestFromUrl = params.get('to') || params.get('kepada');
-    if (guestFromUrl) {
-      setData(prev => ({ ...prev, recipientName: guestFromUrl }));
-    }
+    const syncGuestFromUrl = () => {
+      const guestFromUrl = getGuestFromUrl();
+      if (guestFromUrl) {
+        setData(prev => ({ ...prev, recipientName: guestFromUrl }));
+      }
+    };
+    syncGuestFromUrl();
+    window.addEventListener('popstate', syncGuestFromUrl);
+    window.addEventListener('hashchange', syncGuestFromUrl);
+    return () => {
+      window.removeEventListener('popstate', syncGuestFromUrl);
+      window.removeEventListener('hashchange', syncGuestFromUrl);
+    };
   }, []);
 
   // Load cloud data from Supabase (Persistent across all devices & domains)
@@ -178,7 +205,20 @@ export default function App() {
       try {
         const cloudSettings = await fetchWeddingSettingsFromSupabase();
         if (isMounted && cloudSettings) {
-          setData(prev => ({ ...prev, ...cloudSettings }));
+          setData(prev => {
+            const guestFromUrl = getGuestFromUrl();
+            const { recipientName: _discarded, ...otherSettings } = cloudSettings;
+            const finalRecipient = guestFromUrl 
+              || (prev.recipientName && prev.recipientName !== 'Bapak/Ibu/Saudara/i' ? prev.recipientName : '')
+              || cloudSettings.defaultRecipientName 
+              || 'Bapak/Ibu/Saudara/i';
+
+            return { 
+              ...prev, 
+              ...otherSettings,
+              recipientName: finalRecipient
+            };
+          });
         }
 
         const cloudGuests = await fetchGuestsFromSupabase();

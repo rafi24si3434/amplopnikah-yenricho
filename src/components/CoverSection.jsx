@@ -23,6 +23,29 @@ export default function CoverSection({ data, onOpenInvitation, isOpen }) {
     triggerWaxSealStampRelease(sealRef.current, onOpenInvitation);
   };
 
+  // Extract recipient name directly from URL (?to=... or ?kepada=... or ?nama=... or hash) with highest priority
+  const getRecipientDisplayName = () => {
+    if (typeof window !== 'undefined') {
+      try {
+        let params = new URLSearchParams(window.location.search);
+        let guest = params.get('to') || params.get('kepada') || params.get('nama') || params.get('guest') || params.get('name');
+        if (!guest && window.location.hash) {
+          const qIdx = window.location.hash.indexOf('?');
+          if (qIdx !== -1) {
+            params = new URLSearchParams(window.location.hash.slice(qIdx));
+            guest = params.get('to') || params.get('kepada') || params.get('nama') || params.get('guest') || params.get('name');
+          }
+        }
+        if (guest && guest.trim()) {
+          return decodeURIComponent(guest.trim().replace(/\+/g, ' '));
+        }
+      } catch (e) {}
+    }
+    return data.recipientName || 'Bapak/Ibu/Saudara/i';
+  };
+
+  const recipientDisplayName = getRecipientDisplayName();
+
   return (
     <section id="cover" className="cover-section">
       <div className="cover-overlay"></div>
@@ -59,7 +82,7 @@ export default function CoverSection({ data, onOpenInvitation, isOpen }) {
           <div className="cover-guest-row">
             <p className="guest-label">Kepada Yth. Bapak/Ibu/Saudara/i:</p>
             <h2 className="guest-name" id="guest-name">
-              {data.recipientName || 'Bapak/Ibu/Saudara/i'}
+              {recipientDisplayName}
             </h2>
             <p className="guest-place">Di Tempat</p>
           </div>

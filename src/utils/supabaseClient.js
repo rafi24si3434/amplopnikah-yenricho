@@ -266,7 +266,7 @@ export async function fetchWeddingSettingsFromSupabase() {
       brideChildOrder: data.bride_child_order,
       brideParents: data.bride_parents,
       senderName: data.sender_name,
-      recipientName: data.recipient_default_name || 'Bapak/Ibu/Saudara/i',
+      defaultRecipientName: data.recipient_default_name || 'Bapak/Ibu/Saudara/i',
       weddingDate: data.wedding_date,
       weddingDateText: data.wedding_date_text,
       musicVolume: data.music_volume ? parseFloat(data.music_volume) : 0.20
@@ -289,6 +289,7 @@ export async function saveWeddingSettingsToSupabase(newData) {
       bride_child_order: newData.brideChildOrder,
       bride_parents: newData.brideParents,
       sender_name: newData.senderName,
+      recipient_default_name: newData.defaultRecipientName || newData.recipientName || 'Bapak/Ibu/Saudara/i',
       wedding_date: newData.weddingDate,
       wedding_date_text: newData.weddingDateText
     };

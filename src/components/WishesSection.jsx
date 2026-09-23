@@ -8,6 +8,12 @@ export default function WishesSection({ defaultName }) {
   const [message, setMessage] = useState('');
   const [wishes, setWishes] = useState([]);
 
+  useEffect(() => {
+    if (defaultName && (!name || name === 'Bapak/Ibu/Saudara/i')) {
+      setName(defaultName);
+    }
+  }, [defaultName]);
+
   const quickWishes = [
     "Sai gabe ma jala horas, pir tondi madingin, tondi matogu! Selamat berbahagia Yenricho & Veni! 🌾💒",
     "Selamat berbahagia Yenricho & Veni! Langgeng sampai kakek nenek. 💍❤️",
