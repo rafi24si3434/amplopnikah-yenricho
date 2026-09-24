@@ -55,7 +55,7 @@ export default function FooterSection({ data, onEnterAdmin }) {
             </p>
 
             <p className="footer-creator-credit">
-              Web ini buatan <span className="creator-name">unluckyyyy</span>
+              Web ini buatan <span className="creator-name">DAYENN</span>
             </p>
 
             {onEnterAdmin && (
