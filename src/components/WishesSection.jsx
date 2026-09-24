@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, MessageCircle, Send, Sparkles } from 'lucide-react';
+import { User, MessageCircle, Send, Sparkles, Heart, CheckCircle2, Clock } from 'lucide-react';
 import { UlosRibbonDivider, GorgaBatakOrnament, CornerGorgaFiligree } from './Ornaments';
 import { supabase, fetchWishesFromSupabase, insertWishToSupabase } from '../utils/supabaseClient';
 
@@ -7,6 +7,7 @@ export default function WishesSection({ defaultName }) {
   const [name, setName] = useState(defaultName || '');
   const [message, setMessage] = useState('');
   const [wishes, setWishes] = useState([]);
+  const [justSent, setJustSent] = useState(false);
 
   useEffect(() => {
     if (defaultName && (!name || name === 'Bapak/Ibu/Saudara/i')) {
@@ -15,11 +16,22 @@ export default function WishesSection({ defaultName }) {
   }, [defaultName]);
 
   const quickWishes = [
-    "Sai gabe ma jala horas, pir tondi madingin, tondi matogu! Selamat berbahagia Yenricho & Veni! 🌾💒",
-    "Selamat berbahagia Yenricho & Veni! Langgeng sampai kakek nenek. 💍❤️",
-    "Tuhan memberkati rumah tangga baru kalian dengan limpahan kasih dan damai sejahtera. 🙏✨",
-    "Horas & Mauliate! Selamat menempuh hidup baru berdua. Pesta adat yang penuh sukacita!",
-    "Doa terbaik untuk hari bahagia kalian berdua, rukun dan sejahtera selalu. 💒🕊️"
+    {
+      label: "Doa Adat Batak (Horas & Gabe)",
+      text: "Sai gabe ma jala horas, pir tondi madingin, tondi matogu! Selamat berbahagia Yenricho & Veni! 🌾💒"
+    },
+    {
+      label: "Berkat Rumah Tangga Baru",
+      text: "Tuhan memberkati rumah tangga baru kalian dengan limpahan kasih, sukacita, dan damai sejahtera. 🙏✨"
+    },
+    {
+      label: "Langgeng & Bahagia Selalu",
+      text: "Selamat menempuh hidup baru Yenricho & Veni! Semoga langgeng, rukun, dan bahagia sampai kakek nenek. 💍❤️"
+    },
+    {
+      label: "Horas & Mauliate",
+      text: "Horas & Mauliate! Selamat berbahagia untuk kedua mempelai dan seluruh keluarga besar. 🥂✨"
+    }
   ];
 
   useEffect(() => {
@@ -114,6 +126,8 @@ export default function WishesSection({ defaultName }) {
     }
 
     setMessage('');
+    setJustSent(true);
+    setTimeout(() => setJustSent(false), 4500);
 
     // Save to Supabase Cloud asynchronously (no login needed)
     insertWishToSupabase(trimmedName, trimmedMessage);
@@ -124,115 +138,180 @@ export default function WishesSection({ defaultName }) {
     const seconds = Math.floor((new Date() - date) / 1000);
     if (seconds < 60) return 'Baru saja';
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes} menit yang lalu`;
+    if (minutes < 60) return `${minutes} menit lalu`;
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours} jam yang lalu`;
+    if (hours < 24) return `${hours} jam lalu`;
     const days = Math.floor(hours / 24);
-    if (days < 30) return `${days} hari yang lalu`;
-    return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    if (days < 30) return `${days} hari lalu`;
+    return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
   return (
     <section 
       id="wishes" 
-      className="section section-dark section-photo-bg"
+      className="section section-wishes-luxury section-photo-bg"
       style={{ backgroundImage: "url('/assets/images/24.jpeg')" }}
     >
-      <div className="section-photo-overlay"></div>
+      <div className="wishes-backdrop-overlay"></div>
 
       <div className="section-content">
         
-        <div className="section-header reveal">
-          <p className="section-label">DOA & RESTU</p>
-          <h2 className="section-title">Ucapan & Doa Restu Tamu</h2>
-          <GorgaBatakOrnament size={44} />
-          <UlosRibbonDivider />
+        {/* High-Contrast Double-Bezel Editorial Header Plate */}
+        <div className="wishes-header-shell reveal">
+          <div className="wishes-header-plate">
+            <div className="wishes-eyebrow-pill">
+              <Sparkles size={13} />
+              <span>DOA &amp; RESTU</span>
+              <Sparkles size={13} />
+            </div>
+            <h2 className="wishes-main-title">Ucapan &amp; Doa Restu Tamu</h2>
+            <p className="wishes-main-subtitle">
+              Untaian doa dan restu tulus dari Bapak/Ibu/Saudara/i merupakan kado terindah
+              bagi perjalanan awal rumah tangga kami.
+            </p>
+            <div className="wishes-header-ornament">
+              <GorgaBatakOrnament size={38} />
+              <UlosRibbonDivider />
+            </div>
+          </div>
         </div>
 
         <div className="wishes-container">
           
-          {/* Form */}
+          {/* Left Column: High-Contrast Form Card */}
           <div className="wishes-form-wrapper reveal">
-            <div className="wishes-form glass-card">
-              <CornerGorgaFiligree position="top-left" />
-              <CornerGorgaFiligree position="bottom-right" />
-              <form onSubmit={handleSubmit} id="wishes-form">
-                
-                <div className="form-group">
-                  <label htmlFor="wish-name">Nama Anda</label>
-                  <div className="input-wrapper">
-                    <User size={18} />
-                    <input 
-                      type="text" 
-                      id="wish-name" 
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Nama Anda / Keluarga" 
-                      required 
-                    />
+            <div className="wishes-card-shell">
+              <div className="wishes-form-card">
+                <CornerGorgaFiligree position="top-left" />
+                <CornerGorgaFiligree position="bottom-right" />
+
+                <div className="wishes-card-head">
+                  <div className="wishes-card-icon">
+                    <MessageCircle size={20} />
+                  </div>
+                  <div>
+                    <h3 className="wishes-card-title">Tulis Ucapan &amp; Doa</h3>
+                    <p className="wishes-card-desc">Pesan Anda akan tampil langsung di dinding doa</p>
                   </div>
                 </div>
 
-                {/* Quick Wishes Bubbles */}
-                <div className="quick-wishes-section">
-                  <span className="quick-wishes-label">✨ Pilihan Balon Ucapan Cepat:</span>
-                  <div className="quick-wishes-row">
-                    {quickWishes.map((preset, idx) => (
-                      <button 
-                        key={idx} 
-                        type="button" 
-                        className="wish-bubble-btn"
-                        onClick={() => setMessage(preset)}
-                      >
-                        {preset.slice(0, 36)}...
-                      </button>
-                    ))}
+                {justSent && (
+                  <div className="wish-sent-toast">
+                    <CheckCircle2 size={18} />
+                    <span>Terima kasih! Ucapan &amp; doa restu Anda telah terkirim.</span>
                   </div>
-                </div>
+                )}
 
-                <div className="form-group">
-                  <label htmlFor="wish-message">Pesan & Doa Restu</label>
-                  <div className="input-wrapper textarea-wrapper">
-                    <MessageCircle size={18} className="textarea-icon" />
-                    <textarea 
-                      id="wish-message" 
-                      rows="4" 
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      placeholder="Tuliskan harapan dan doa terbaik untuk Yenricho & Veni..." 
-                      required
-                    ></textarea>
+                <form onSubmit={handleSubmit} id="wishes-form">
+                  
+                  <div className="wishes-field-group">
+                    <label htmlFor="wish-name" className="wishes-field-label">
+                      Nama Lengkap / Keluarga
+                    </label>
+                    <div className="wishes-input-box">
+                      <User size={18} className="wishes-input-icon" />
+                      <input 
+                        type="text" 
+                        id="wish-name" 
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Contoh: Kel. Bpk. H. Simanjuntak" 
+                        required 
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <button type="submit" className="btn-submit" id="btn-submit-wish">
-                  <Send size={18} />
-                  <span>Kirim Ucapan</span>
-                </button>
-              </form>
+                  {/* Quick Wishes Templates */}
+                  <div className="quick-wishes-section">
+                    <span className="quick-wishes-label">
+                      <Sparkles size={13} /> Pilihan Cepat Doa &amp; Ucapan (Klik untuk memilih):
+                    </span>
+                    <div className="quick-wishes-grid">
+                      {quickWishes.map((preset, idx) => {
+                        const isSelected = message === preset.text;
+                        return (
+                          <button 
+                            key={idx} 
+                            type="button" 
+                            className={`wish-preset-chip ${isSelected ? 'active' : ''}`}
+                            onClick={() => setMessage(preset.text)}
+                          >
+                            <span className="preset-chip-title">{preset.label}</span>
+                            <span className="preset-chip-preview">“{preset.text.slice(0, 58)}...”</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="wishes-field-group">
+                    <label htmlFor="wish-message" className="wishes-field-label">
+                      Pesan &amp; Doa Restu Anda
+                    </label>
+                    <div className="wishes-input-box textarea-box">
+                      <textarea 
+                        id="wish-message" 
+                        rows="4" 
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        placeholder="Tuliskan harapan dan doa terbaik untuk Yenricho & Veni..." 
+                        required
+                      ></textarea>
+                    </div>
+                  </div>
+
+                  <button type="submit" className="btn-wishes-submit" id="btn-submit-wish">
+                    <Send size={17} />
+                    <span>Kirim Doa &amp; Ucapan</span>
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
 
-          {/* List of Wishes */}
+          {/* Right Column: High-Contrast Guest Wishes Feed */}
           <div className="wishes-list-wrapper reveal">
-            <div className="wishes-list-header">
-              <h3>{wishes.length} Doa & Ucapan Hangat</h3>
-            </div>
-            <div className="wishes-list" id="wishes-list">
-              {wishes.map((wish, index) => (
-                <div key={index} className="wish-item glass-card">
-                  <div className="wish-avatar">
-                    {(wish.name || 'G').charAt(0).toUpperCase()}
-                  </div>
-                  <div className="wish-content">
-                    <div className="wish-author-row">
-                      <h4 className="wish-author">{wish.name}</h4>
-                      <span className="wish-time">{getTimeAgo(wish.time)}</span>
+            <div className="wishes-feed-shell">
+              <div className="wishes-feed-card">
+                <div className="wishes-feed-header">
+                  <div className="wishes-feed-header-left">
+                    <span className="wishes-count-badge">{wishes.length}</span>
+                    <div>
+                      <h3 className="wishes-feed-title">Doa &amp; Ucapan Hangat</h3>
+                      <p className="wishes-feed-subtitle">Terhubung secara langsung (Realtime)</p>
                     </div>
-                    <p className="wish-text">{wish.message}</p>
                   </div>
+                  <span className="wishes-live-pill">
+                    <span className="live-dot-pulse"></span>
+                    LIVE
+                  </span>
                 </div>
-              ))}
+
+                <div className="wishes-list" id="wishes-list">
+                  {wishes.map((wish, index) => (
+                    <div key={wish.id || index} className="wish-item-luxury">
+                      <div className="wish-avatar-luxury">
+                        {(wish.name || 'T').charAt(0).toUpperCase()}
+                      </div>
+                      <div className="wish-body-luxury">
+                        <div className="wish-meta-row">
+                          <div className="wish-author-group">
+                            <h4 className="wish-author-name">{wish.name}</h4>
+                            <span className="wish-verified-tag">
+                              <Heart size={10} fill="currentColor" /> Tamu Undangan
+                            </span>
+                          </div>
+                          <span className="wish-time-pill">
+                            <Clock size={11} />
+                            {getTimeAgo(wish.time)}
+                          </span>
+                        </div>
+                        <p className="wish-message-text">“{wish.message}”</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -242,3 +321,4 @@ export default function WishesSection({ defaultName }) {
     </section>
   );
 }
+
